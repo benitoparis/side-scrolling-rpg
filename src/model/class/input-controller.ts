@@ -5,6 +5,7 @@ export class InputController {
     right = false;
     up = false;
     kick = false;
+    isAttacking = false;
 
     constructor(){
     }

@@ -5,24 +5,31 @@ var Player = /** @class */ (function () {
         this.width = 200;
         this.height = 200;
         this.jump = false;
+        this.speedX = 0;
+        this.speedY = 0;
+        this.color = '#E44C4A';
         this.x = x;
         this.y = y;
     }
     Player.prototype.update = function (input) {
         console.log('update');
         if (input.up && !this.jump) {
-            this.y -= 200;
+            this.speedY = 500;
+            this.y -= this.speedY;
             this.jump = true;
         }
         if (input.left) {
-            this.x -= 0.5;
+            this.speedX = 10;
+            this.x -= this.speedX;
         }
         if (input.right) {
-            this.x += 0.5;
+            this.speedX = 10;
+            this.x += this.speedX;
         }
-        this.y += 1;
-        if (this.y > 800) {
-            this.y = 900;
+        this.speedY = 30 * 0.9;
+        this.y += this.speedY;
+        if (this.y > 700) {
+            this.y = 700;
             this.jump = false;
         }
     };

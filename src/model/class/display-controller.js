@@ -7,14 +7,17 @@ var DisplayController = /** @class */ (function () {
     }
     DisplayController.prototype.initCanvas = function () {
     };
-    DisplayController.prototype.draw = function (shape, x, y, width, height) {
+    DisplayController.prototype.draw = function (shape, data) {
+        var x = data.x, y = data.y, width = data.width, height = data.height, color = data.color;
         console.log('draw');
+        this.ctx.fillStyle = color;
         switch (shape) {
             case 'rectangle':
-                this.ctx.rect(x, y, width, height);
+                this.ctx.fillRect(x, y, width, height);
                 break;
             default:
-                this.ctx.rect(x, y, width, height);
+                this.ctx.fillRect(x, y, width, height);
+                break;
         }
     };
     ;
@@ -22,6 +25,7 @@ var DisplayController = /** @class */ (function () {
     };
     ;
     DisplayController.prototype.clear = function () {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     };
     ;
     return DisplayController;
