@@ -131,7 +131,7 @@ function () {
     this.canvas = canvas;
     this.canvas.width = 800; //window.innerWidth;
 
-    this.canvas.height = 800; //window.innerHeight;
+    this.canvas.height = 600; //window.innerHeight;
 
     this.ctx = this.canvas.getContext('2d');
   }
@@ -166,10 +166,10 @@ function () {
     30, 30, 150, // Largeur de la partie à croper
     150, // Hauteur de la partie à corper
     this.canvas.width / 2 - player.width / 2, // on l'affiche toujours au milieu du canvas // Position x de l'image à croper sur le canvas
-    player.y, // on l'affiche toujours au milieu du canvas // Position y de l'image à croper sur le canvas
+    this.canvas.height - 192 - player.height, // on l'affiche toujours au milieu du canvas // Position y de l'image à croper sur le canvas
     //this.width, // Largeur de la partie cropée
     //this.height // Hauteur de la partie cropée
-    200, 200);
+    64, 64);
   };
 
   ;
@@ -214,7 +214,7 @@ function () {
     console.log('event', event);
     this.canvas.width = 800; //window.innerWidth;
 
-    this.canvas.height = 800; // window.innerHeight;
+    this.canvas.height = 600; // window.innerHeight;
   };
 
   return DisplayController;
@@ -254,8 +254,8 @@ var Player =
 /** @class */
 function () {
   function Player(x, y) {
-    this.width = 200;
-    this.height = 200;
+    this.width = 64;
+    this.height = 64;
     this.jump = false;
     this.speedX = 5;
     this.speedY = 5;
@@ -290,15 +290,20 @@ function () {
 
     if (input.right) {
       this.speedX = 5; //this.x += this.speedX;
-    }
+    } //this.speedY = 2;
+    //this.y += this.speedY;
+    // if (this.y > 700){ // Si le player se trouve plus bas que palier
+    //     this.jump = false;
+    //     this.y = 700;
+    // }
 
-    this.speedY = 2;
-    this.y += this.speedY;
 
-    if (this.y > 700) {
-      // Si le player se trouve plus bas que palier
-      this.jump = false;
-      this.y = 700;
+    if (this.x < 300) {
+      // On empeche le joueur d'aller au bord gauche de la map courante
+      this.x = this.x + 10;
+    } else if (this.x > 4000) {
+      // On empeche le joueur d'aller au bord droit de la map courante
+      this.x = this.x - 10;
     }
   };
 
@@ -609,12 +614,12 @@ var viewport_1 = require("./src/model/class/viewport");
 
 var canvas = document.getElementById('game');
 var displayController = new display_controller_1.DisplayController(canvas);
-var player = new player_1.Player(600, 600);
+var player = new player_1.Player(400, 700);
 var inputController = new input_controller_1.InputController();
-var viewPort = new viewport_1.ViewPort(0, 0, 300, 300);
+var viewPort = new viewport_1.ViewPort(0, 0, 800, 600);
 exports.gameService = new game_service_1.GameService();
 var enemiesList = [];
-var mapArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+var mapArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
 var tileSetImg = document.getElementById('tileset');
 var collideBrick; // Méthode pour créer des ennemis
 
@@ -695,42 +700,75 @@ function loop() {
   console.log('animation');
   displayController.clear(); //displayController.drawBackground(backGroundImg, player);
 
-  player.update(inputController);
-  displayController.drawSprite(playerImg, player);
-  var columNb = 40;
+  var columNb = 80;
+  var rawNb = 12;
   var indexRaw = 0;
   var tileSize = 64;
   var canvasX = 0;
   var canvasY = 0;
   var cropX;
   var cropY;
-  var xMin = Math.floor(viewPort.x / tileSize); // Collone minimale
+  var xMin = Math.floor(viewPort.x / tileSize); // Colone minimale
 
   var yMin = Math.floor(viewPort.y / tileSize); // Rangée Minimum
 
-  var xMax = Math.ceil((viewPort.x + viewPort.width) / tileSize); // Collone maximale
+  var xMax = Math.ceil((viewPort.x + viewPort.width) / tileSize); // Colone maximale
 
   var yMax = Math.ceil((viewPort.y + viewPort.height) / tileSize); // Rangée Minimale
 
-  for (var i = 0; i < mapArray.length; i++) {
-    indexRaw = Math.floor(i / columNb);
-    canvasX = (i - indexRaw * columNb) * tileSize;
-    canvasY = indexRaw * tileSize;
+  console.log({
+    xMin: xMin,
+    yMin: yMin,
+    xMax: xMax,
+    yMax: yMax
+  });
 
-    switch (mapArray[i]) {
-      case 0:
-        cropX = 320;
-        cropY = 320;
-        break;
+  for (var x = xMin; x < xMax; x++) {
+    for (var y = yMin; y < yMax; y++) {
+      var value = mapArray[y * columNb + x];
+      canvasX = x * tileSize - viewPort.x;
+      canvasY = y * tileSize - viewPort.y;
 
-      case 1:
-        cropX = 64;
-        cropY = 0;
-        break;
+      switch (value) {
+        case 0:
+          cropX = 320;
+          cropY = 320;
+          break;
+
+        case 1:
+          cropX = 64;
+          cropY = 0;
+          break;
+
+        case 2:
+          cropX = 256;
+          cropY = 0;
+          break;
+      }
+
+      displayController.drawImg(tileSetImg, cropX, cropY, canvasX, canvasY);
     }
+  }
 
-    displayController.drawImg(tileSetImg, cropX, cropY, canvasX, canvasY);
-  } // if (inputController.isAttacking){
+  player.update(inputController);
+  displayController.drawSprite(playerImg, player);
+  viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 + 192, 800, 600); // for (let i = 0; i < mapArray.length; i++){
+  //     indexRaw = Math.floor(i /  columNb);
+  //     canvasX = (i - indexRaw * columNb) * tileSize;
+  //     canvasY = indexRaw * tileSize;
+  //     switch(mapArray[i]){
+  //         case 0:
+  //             cropX = 320;
+  //             cropY = 320;
+  //             break;
+  //         case 1:
+  //             cropX = 64;
+  //             cropY = 0;
+  //             break;
+  //     }
+  //     displayController.drawImg(tileSetImg,cropX, cropY, canvasX, canvasY);
+  // }
+  // if (inputController.isAttacking){
   //     displayController.draw('rectangle', player.damageZone);
   // }
   // enemiesList.forEach((enemy, index) => {
@@ -752,7 +790,6 @@ function loop() {
   //         player.setJump(false);
   //     };
   // });
-
 
   window.requestAnimationFrame(loop);
 } // fetch('/levels.json').then(data=> {
@@ -820,7 +857,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49227" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62413" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

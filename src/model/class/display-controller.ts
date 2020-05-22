@@ -11,7 +11,7 @@ export class DisplayController {
     ){
         this.canvas = canvas;
         this.canvas.width = 800 //window.innerWidth;
-        this.canvas.height = 800 //window.innerHeight;
+        this.canvas.height = 600 //window.innerHeight;
         this.ctx = this.canvas.getContext('2d');
     }
 
@@ -55,11 +55,11 @@ export class DisplayController {
             150 , // Largeur de la partie à croper
             150 , // Hauteur de la partie à corper
             (this.canvas.width / 2) - player.width / 2, // on l'affiche toujours au milieu du canvas // Position x de l'image à croper sur le canvas
-            player.y, // on l'affiche toujours au milieu du canvas // Position y de l'image à croper sur le canvas
+            (this.canvas.height - 192 - player.height), // on l'affiche toujours au milieu du canvas // Position y de l'image à croper sur le canvas
             //this.width, // Largeur de la partie cropée
             //this.height // Hauteur de la partie cropée
-            200,
-            200
+            64,
+            64
             );
     };
 
@@ -104,7 +104,7 @@ export class DisplayController {
 
         console.log('event', event);
         this.canvas.width = 800 //window.innerWidth;
-        this.canvas.height = 800 // window.innerHeight;
+        this.canvas.height = 600 // window.innerHeight;
     }
       
 }
