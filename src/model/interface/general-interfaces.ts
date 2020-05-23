@@ -3,5 +3,7 @@ export interface sprite {
     y: number,
     width: number,
     height: number,
-    color: string
+    color?: string,
+    faceX?: number,
+    faceY?: number
 }

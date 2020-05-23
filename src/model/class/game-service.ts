@@ -1,4 +1,5 @@
 import { sprite } from '../interface/general-interfaces';
+import { Player } from './player';
 
 export class GameService {
 
@@ -25,8 +26,7 @@ export class GameService {
     handleCollision(a: sprite, b: sprite){
  
         if (
-            (a.y + a.height < b.y + 20 &&
-            a.y + a.height > b.y )
+            (a.y + a.height < b.y + 20 && a.y + a.height > b.y)
             && ((a.x + a.width > b.x && a.x + a.width < b.x + b.width) 
             || (a.x < b.x + b.width && a.x > b.x))
 

@@ -7,14 +7,17 @@ export class Player {
     y: number;
     centerX: number;
     centerY: number;
-    width = 64;
-    height=  64;
+    faceX= 30;
+    faceY= 30;
+    width=64;
+    height=64;
     jump = false;
-    speedX = 5;
-    speedY = 5;
+    speedX=5;
+    speedY=5;
     color= '#E44C4A';
     isAttacking: boolean;
     damageZone: sprite;
+    groundY = 704;
 
 
     constructor(
@@ -29,16 +32,12 @@ export class Player {
 
     update(input: InputController){
 
-        console.log('input', input);
-
-        console.log('update');
-
         if(input.isAttacking){ // Si le joueur attaque
             this.attack();
         }
 
         if (input.up && this.jump === false){
-            this.speedY = 500
+            this.speedY = 230;
             this.jump = true;
             this.y -= this.speedY;
         }
@@ -47,24 +46,30 @@ export class Player {
         this.x += this.speedX;
 
         if (input.left){
-            this.speedX = -5;
+            this.speedX = -1;
             //this.x += this.speedX;
         }
 
         if (input.right){
-            this.speedX = 5;
+            this.speedX = 1;
             //this.x += this.speedX;
         }
         
-        //this.speedY = 2;
-        //this.y += this.speedY;
+        this.speedY = 1;
+        this.y += this.speedY;
+
+        
+        if ((this.y + this.height) > this.groundY){
+             this.y = this.groundY - 64;
+             this.jump = false;
+        }
 
         // if (this.y > 700){ // Si le player se trouve plus bas que palier
         //     this.jump = false;
         //     this.y = 700;
         // }
 
-        if(this.x < 300){ // On empeche le joueur d'aller au bord gauche de la map courante
+        if (this.x < 300) { // On empeche le joueur d'aller au bord gauche de la map courante
             this.x = this.x + 10;
         } else if(this.x > 4000){ // On empeche le joueur d'aller au bord droit de la map courante
             this.x = this.x - 10; 

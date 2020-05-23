@@ -46,21 +46,15 @@ export class DisplayController {
     drawSprite(charaterImg: any, player: sprite){
         this.ctx.drawImage(
             charaterImg,
-            //this.faceX , // Position X de la partie à croper
-            //this.faceY , // Position Y de la partie à croper
-            30,
-            30,
-            
-            
+            player.faceX, // Position X de la partie à croper
+            player.faceY, // Position Y de la partie à croper
             150 , // Largeur de la partie à croper
             150 , // Hauteur de la partie à corper
             (this.canvas.width / 2) - player.width / 2, // on l'affiche toujours au milieu du canvas // Position x de l'image à croper sur le canvas
-            (this.canvas.height - 192 - player.height), // on l'affiche toujours au milieu du canvas // Position y de l'image à croper sur le canvas
-            //this.width, // Largeur de la partie cropée
-            //this.height // Hauteur de la partie cropée
-            64,
-            64
-            );
+            (this.canvas.height - 256 - player.height), // on l'affiche toujours au milieu du canvas // Position y de l'image à croper sur le canvas
+            player.width, // Largeur de la partie cropée
+            player.height // Hauteur de la partie cropée
+        );
     };
 
     clear(){
@@ -106,5 +100,9 @@ export class DisplayController {
         this.canvas.width = 800 //window.innerWidth;
         this.canvas.height = 600 // window.innerHeight;
     }
-      
+   
+    drawTxt(txt: string){
+        this.ctx.font = "20px Arial";
+        this.ctx.fillText(txt, 10, 50);
+    }
 }
