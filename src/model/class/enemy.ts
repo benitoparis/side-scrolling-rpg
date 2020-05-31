@@ -7,8 +7,8 @@ export class Enemy {
     //energy: number;
     x: number;
     y: number;
-    width = 48;
-    height = 48;
+    width = 64;
+    height = 64;
     centerX: number;
     centerY: number;
     //reference: string;
@@ -16,10 +16,10 @@ export class Enemy {
     //mapIndexPosition = Math.floor(this.centerX / 48) + (60 * Math.floor(this.centerY / 48));
     speedX = 2;
     speedY = 2;
-    color= '#6BE44A';
+    color = '#6BE44A';
     //direction: string;
-    //faceX = 0;
-    //faceY = 64;
+    faceX = 0;
+    faceY = 64;
     //currentLoopIndex = 0;
     //rightCycleLoop = [{faceX:0,faceY:64}, {faceX:32,faceY:64},{faceX:0,faceY:64},{faceX:64,faceY:64}];
     //leftCycleLoop = [{faceX:0,faceY:32}, {faceX:32,faceY:32},{faceX:0,faceY:32},{faceX:64,faceY:32}];

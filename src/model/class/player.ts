@@ -1,5 +1,6 @@
 import { InputController } from './input-controller';
 import { sprite } from '../interface/general-interfaces';
+import { DamageZone } from './damage-zone';
 
 export class Player {
 
@@ -7,8 +8,8 @@ export class Player {
     y: number;
     centerX: number;
     centerY: number;
-    faceX= 30;
-    faceY= 30;
+    faceX= 0;
+    faceY= 64;
     width=64;
     height=64;
     jump = false;
@@ -16,10 +17,14 @@ export class Player {
     speedY=5;
     color= '#E44C4A';
     isAttacking: boolean;
-    damageZone: sprite;
+    damageZone: DamageZone;
     groundY = 704;
-
-
+    currentLoopIndex = 0;
+    rightCycleLoop = [{faceX:0,faceY:64}, {faceX:32,faceY:64},{faceX:0,faceY:64},{faceX:64,faceY:64}];
+    leftCycleLoop = [{faceX:0,faceY:32}, {faceX:32,faceY:32},{faceX:0,faceY:32},{faceX:64,faceY:32}];
+    upCycleLoop = [{faceX:0,faceY:96}, {faceX:32,faceY:96},{faceX:0,faceY:96},{faceX:64,faceY:96}];
+    downCycleLoop = [{faceX:0,faceY:0}, {faceX:32,faceY:0},{faceX:0,faceY:0},{faceX:64,faceY:0}];
+    
     constructor(
         x: number,
         y: number,
@@ -28,9 +33,11 @@ export class Player {
         this.y= y;
         this.centerX = (this.x + this.width / 2);
         this.centerY = (this.y + this.height / 2);
+        this.damageZone = 
     }
 
     update(input: InputController){
+
 
         if(input.isAttacking){ // Si le joueur attaque
             this.attack();
@@ -75,6 +82,7 @@ export class Player {
             this.x = this.x - 10; 
         }
 
+      this.updateFaceCrop(input);
     }
 
     setPosition(x: number, y: number){
@@ -85,19 +93,53 @@ export class Player {
     }
 
     // Méthode appelée quand le bouton de saut est touché
-    setJump(status : boolean){
+    setJump(status : boolean): void {
         this.jump = status;
     }
 
     // Méthode appelée quand le bouton d'action est touchée
-    attack() {
-        console.log('attack');
-        this.damageZone =  {
-            x: (this.x + this.width / 2),
-            y:  this.y - this.height / 2,
-            width: this.width,
-            height: this.height,
-            color: '#DC7633'
+    attack(status : boolean): void {
+        this.isAttacking = status;
+    }
+
+    // Méthode pour définir les coordonnées de la posture à croper
+    updateFaceCrop(input: InputController): void {
+
+        // On incrémente le compteur de pas
+        if (this.currentLoopIndex < 3){
+            this.currentLoopIndex++
+        } else if(this.currentLoopIndex === 3){
+            this.currentLoopIndex = 0;
         }
+        
+        let cycle: any[];
+
+        if (input.left){
+            cycle = this.leftCycleLoop;
+        } else if (input.right){
+            cycle = this.rightCycleLoop;
+        } else if(input.up){
+            cycle = this.upCycleLoop;
+        } else if (input.up){
+            cycle = this.upCycleLoop;
+        }
+        
+        this.faceX = cycle[this.currentLoopIndex].faceX;
+        this.faceY = cycle[this.currentLoopIndex].faceY;
+    }
+
+    // On met à jour la zone d'attaque devant le joueur
+    updateDamageZone(input: InputController): void {
+
+        let x: number
+        let y = this.y - this.height /2;
+
+        if (input.left) { // Si direction vers la gauche
+            x = this.x - this.width / 2;
+        } else if (input.right){ // Si direction vers la droite
+            x = this.x + this.width / 2;
+        }
+
+        this.damageZone = new DamageZone(x, y, this.width, this.height);
     }
 }

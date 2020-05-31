@@ -21,13 +21,13 @@ let enemiesList =  [];
 
 let mapArray = [
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,4,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,4,5,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1,1,1,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -42,6 +42,8 @@ let mapArray = [
 ];
 
 let tileSetImg = document.getElementById('tileset');
+let playerImg = document.getElementById('heros6');
+let enemyImg = document.getElementById('personnage-important2');
 
 
 
@@ -52,8 +54,8 @@ const initEnemies = (count: number)=>{
 
     // 0n crée plusieurs ennemis
     for (let i = 0; i < count; i++) {
-        const x = gameService.rangeNumber(1, 600);
-        const y = gameService.rangeNumber(1, 800);
+        const x = gameService.rangeNumber(400, 1500);
+        const y = 640;
 
         enemiesList = [...enemiesList, new Enemy(x, y)];
     } 
@@ -79,7 +81,7 @@ const initPlateforms = (count: number)=> {
             brickList = [...brickList, newBrick];
         }
         
-        brickList.forEach(item=> {
+        brickList.forEach(item => {
             if (!gameService.checkCollision(item,newBrick)){ // Si pas de collision avec une brique existante
                 // On l'ajoute à la liste des briques
                 brickList = [...brickList, newBrick];
@@ -132,16 +134,11 @@ canvas.addEventListener("touchend", handleEnd, false);
 // L'animation générale
 function loop() {
 
-    const savedPlayerX = player.x;
-    const savedPlayerY = player.y;
-
     displayController.clear();
 
     //displayController.drawBackground(backGroundImg, player);
 
-   
 
-   
     const columNb = 80;
     let indexRaw = 0;
     const tileSize = 64;
@@ -183,15 +180,26 @@ function loop() {
                     cropX = 384;
                     cropY = 0;
                     break;
+                case 4:
+                    cropX = 320;
+                    cropY = 256;
+                    break;
+                case 5:
+                    cropX = 384;
+                    cropY = 256;
+                    break;
             }
-            displayController.drawImg(tileSetImg,cropX, cropY, canvasX, canvasY);
+            if(value !== 0){
+                displayController.drawImg(tileSetImg,cropX, cropY, canvasX, canvasY);
+            }
+            
         }
 
     }
 
 
     player.update(inputController);
-    displayController.drawSprite(playerImg, player);
+    displayController.drawSprite(playerImg, viewPort, player);
     viewPort.defineViewPoint(player.x - ((800 / 2) - player.width / 2), (player.y - (600/2) + 20), 800, 600);
 
 
@@ -252,14 +260,14 @@ function loop() {
     //     displayController.draw('rectangle', player.damageZone);
     // }
     
-    // enemiesList.forEach((enemy, index) => {
-    //     displayController.draw('rectangle', enemy);
+    enemiesList.forEach((enemy, index) => {
+        displayController.drawSprite(enemyImg, viewPort, enemy);
 
-    //     if(player.damageZone && gameService.checkCollision(player.damageZone, enemy)){
-    //         alert('collision entre ennemi et damagezone');
-    //         enemiesList.splice(index, 1); 
-    //     }
-    // });
+        // if(player.damageZone && gameService.checkCollision(player.damageZone, enemy)){
+        //     alert('collision entre ennemi et damagezone');
+        //     enemiesList.splice(index, 1); 
+        // }
+    });
     
 
   
@@ -318,11 +326,7 @@ function loop() {
 
 
 
-let playerImg = new Image();
-playerImg.src = 'https://www.pngkey.com/png/full/344-3448121_best-of-sprite-sheet-png-terraria-character-sprite.png';
-playerImg.onload = ()=> {
 
-};
 
 window.addEventListener('resize', displayController.resizeCanvas, false);
 window.addEventListener('orientationchange', displayController.resizeCanvas, false);

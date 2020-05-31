@@ -1,4 +1,7 @@
 import { sprite } from '../interface/general-interfaces';
+import { Player } from './player';
+import { Enemy } from './enemy';
+import { ViewPort } from './viewport';
 
 
 export class DisplayController {
@@ -43,18 +46,33 @@ export class DisplayController {
         
     };
 
-    drawSprite(charaterImg: any, player: sprite){
+    drawSprite(characterImg: any, viewPort: ViewPort, sprite: sprite){
+
+        // On va déterminer les coordonnées Y/Y du sprite à affichernsur le canvas
+        let canvasX: number;
+        let canvasY: number;
+
+        if (sprite instanceof Player){
+            canvasX = (this.canvas.width / 2) - sprite.width / 2;
+            canvasY = (this.canvas.height - 256 - sprite.height);
+        }
+        if (sprite instanceof Enemy){
+            canvasX = sprite.x - viewPort.x;
+            canvasY = sprite.y - viewPort.y;
+        }
+
         this.ctx.drawImage(
-            charaterImg,
-            player.faceX, // Position X de la partie à croper
-            player.faceY, // Position Y de la partie à croper
-            150 , // Largeur de la partie à croper
-            150 , // Hauteur de la partie à corper
-            (this.canvas.width / 2) - player.width / 2, // on l'affiche toujours au milieu du canvas // Position x de l'image à croper sur le canvas
-            (this.canvas.height - 256 - player.height), // on l'affiche toujours au milieu du canvas // Position y de l'image à croper sur le canvas
-            player.width, // Largeur de la partie cropée
-            player.height // Hauteur de la partie cropée
+            characterImg,
+            sprite.faceX, // Position X de la partie à croper
+            sprite.faceY, // Position Y de la partie à croper
+            32 , // Largeur de la partie à croper
+            32 , // Hauteur de la partie à corper
+            canvasX, // on l'affiche toujours au milieu du canvas // Position x de l'image à croper sur le canvas
+            canvasY, // on l'affiche toujours au milieu du canvas // Position y de l'image à croper sur le canvas
+            sprite.width, // Largeur de la partie cropée
+            sprite.height // Hauteur de la partie cropée
         );
+
     };
 
     clear(){

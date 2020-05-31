@@ -117,138 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/model/class/display-controller.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var DisplayController =
-/** @class */
-function () {
-  function DisplayController(canvas) {
-    this.canvas = canvas;
-    this.canvas.width = 800; //window.innerWidth;
-
-    this.canvas.height = 600; //window.innerHeight;
-
-    this.ctx = this.canvas.getContext('2d');
-  }
-
-  DisplayController.prototype.initCanvas = function () {};
-
-  DisplayController.prototype.draw = function (shape, data, player) {
-    var x = data.x,
-        y = data.y,
-        width = data.width,
-        height = data.height,
-        color = data.color;
-    console.log('draw');
-    this.ctx.fillStyle = color;
-
-    switch (shape) {
-      case 'rectangle':
-        this.ctx.fillRect(x - player.x, y, width, height);
-        break;
-
-      default:
-        this.ctx.fillRect(x, y, width, height);
-        break;
-    }
-  };
-
-  ;
-
-  DisplayController.prototype.drawSprite = function (charaterImg, player) {
-    this.ctx.drawImage(charaterImg, player.faceX, // Position X de la partie à croper
-    player.faceY, // Position Y de la partie à croper
-    150, // Largeur de la partie à croper
-    150, // Hauteur de la partie à corper
-    this.canvas.width / 2 - player.width / 2, // on l'affiche toujours au milieu du canvas // Position x de l'image à croper sur le canvas
-    this.canvas.height - 256 - player.height, // on l'affiche toujours au milieu du canvas // Position y de l'image à croper sur le canvas
-    player.width, // Largeur de la partie cropée
-    player.height // Hauteur de la partie cropée
-    );
-  };
-
-  ;
-
-  DisplayController.prototype.clear = function () {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  };
-
-  ;
-
-  DisplayController.prototype.drawBackground = function (backgroundImg, player) {
-    this.ctx.drawImage(backgroundImg, // Objet image représentant le background
-    player.x - this.canvas.width / 2, // Position X de la partie à croper
-    //player.y - 288.5, // Position Y de la partie à croper
-    0, // Position Y de la partie à croper
-    this.canvas.width, // Largeur de la partie à croper
-    this.canvas.height, // Hauteur de la partie à corper
-    0, // Position X sur le canvas de l'image cropée
-    0, // Position Y sur le canvas de l'image cropée
-    this.canvas.width, // Largeur de l'image cropée sur le canvas
-    this.canvas.height // Hauteur de l'image cropée sur le canvas
-    );
-  };
-
-  ;
-
-  DisplayController.prototype.drawImg = function (img, cropX, cropY, canvasX, canvasY) {
-    this.ctx.drawImage(img, // Objet image représentant le background
-    cropX, // Position X de la partie à croper
-    //player.y - 288.5, // Position Y de la partie à croper
-    cropY, // Position Y de la partie à croper
-    64, // Largeur de la partie à croper
-    64, // Hauteur de la partie à corper
-    canvasX, // Position X sur le canvas de l'image cropée
-    canvasY, // Position Y sur le canvas de l'image cropée
-    64, // Largeur de l'image cropée sur le canvas
-    64 // Hauteur de l'image cropée sur le canvas
-    );
-  };
-
-  DisplayController.prototype.resizeCanvas = function (event) {
-    console.log('event', event);
-    this.canvas.width = 800; //window.innerWidth;
-
-    this.canvas.height = 600; // window.innerHeight;
-  };
-
-  DisplayController.prototype.drawTxt = function (txt) {
-    this.ctx.font = "20px Arial";
-    this.ctx.fillText(txt, 10, 50);
-  };
-
-  return DisplayController;
-}();
-
-exports.DisplayController = DisplayController;
-},{}],"src/model/class/input-controller.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var InputController =
-/** @class */
-function () {
-  function InputController() {
-    this.left = false;
-    this.right = false;
-    this.up = false;
-    this.kick = false;
-    this.isAttacking = false;
-  }
-
-  return InputController;
-}();
-
-exports.InputController = InputController;
-},{}],"src/model/class/player.ts":[function(require,module,exports) {
+})({"src/model/class/player.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -259,8 +128,8 @@ var Player =
 /** @class */
 function () {
   function Player(x, y) {
-    this.faceX = 30;
-    this.faceY = 30;
+    this.faceX = 0;
+    this.faceY = 64;
     this.width = 64;
     this.height = 64;
     this.jump = false;
@@ -268,6 +137,59 @@ function () {
     this.speedY = 5;
     this.color = '#E44C4A';
     this.groundY = 704;
+    this.currentLoopIndex = 0;
+    this.rightCycleLoop = [{
+      faceX: 0,
+      faceY: 64
+    }, {
+      faceX: 32,
+      faceY: 64
+    }, {
+      faceX: 0,
+      faceY: 64
+    }, {
+      faceX: 64,
+      faceY: 64
+    }];
+    this.leftCycleLoop = [{
+      faceX: 0,
+      faceY: 32
+    }, {
+      faceX: 32,
+      faceY: 32
+    }, {
+      faceX: 0,
+      faceY: 32
+    }, {
+      faceX: 64,
+      faceY: 32
+    }];
+    this.upCycleLoop = [{
+      faceX: 0,
+      faceY: 96
+    }, {
+      faceX: 32,
+      faceY: 96
+    }, {
+      faceX: 0,
+      faceY: 96
+    }, {
+      faceX: 64,
+      faceY: 96
+    }];
+    this.downCycleLoop = [{
+      faceX: 0,
+      faceY: 0
+    }, {
+      faceX: 32,
+      faceY: 0
+    }, {
+      faceX: 0,
+      faceY: 0
+    }, {
+      faceX: 64,
+      faceY: 0
+    }];
     this.x = x;
     this.y = y;
     this.centerX = this.x + this.width / 2;
@@ -291,10 +213,14 @@ function () {
 
     if (input.left) {
       this.speedX = -1; //this.x += this.speedX;
+
+      this.setFaceCrop('left');
     }
 
     if (input.right) {
       this.speedX = 1; //this.x += this.speedX;
+
+      this.setFaceCrop('right');
     }
 
     this.speedY = 1;
@@ -340,81 +266,47 @@ function () {
       height: this.height,
       color: '#DC7633'
     };
+  }; // Méthode pour définir les coordonnées de la posture à croper
+
+
+  Player.prototype.setFaceCrop = function (direction) {
+    // On incrémente le compteur de pas
+    if (this.currentLoopIndex < 3) {
+      this.currentLoopIndex++;
+    } else if (this.currentLoopIndex === 3) {
+      this.currentLoopIndex = 0;
+    }
+
+    var cycle;
+
+    switch (direction) {
+      case 'left':
+        cycle = this.leftCycleLoop;
+        break;
+
+      case 'right':
+        cycle = this.rightCycleLoop;
+        break;
+
+      case 'up':
+        cycle = this.upCycleLoop;
+        break;
+
+      case 'down':
+        cycle = this.upCycleLoop;
+        break;
+    }
+
+    this.faceX = cycle[this.currentLoopIndex].faceX;
+    this.faceY = cycle[this.currentLoopIndex].faceY;
   };
+
+  Player.prototype.updateDamageZone = function () {};
 
   return Player;
 }();
 
 exports.Player = Player;
-},{}],"src/model/class/game-service.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var GameService =
-/** @class */
-function () {
-  function GameService() {} // On vérifie s'il y a collusion entre deux sprites
-
-
-  GameService.prototype.checkCollision = function (a, b) {
-    // On vérifie si A et B sont sur la même mapsheet et s'il y a collision
-    if (b.x > a.x + a.width || b.x < a.x - b.width || b.y > a.y + a.height || b.y < a.y - b.height) {
-      // Pas de collision
-      return false;
-    } else {
-      // collision
-      return true;
-    }
-  }; // On réagit à la collision
-
-
-  GameService.prototype.handleCollision = function (a, b) {
-    if (a.y + a.height < b.y + 20 && a.y + a.height > b.y && (a.x + a.width > b.x && a.x + a.width < b.x + b.width || a.x < b.x + b.width && a.x > b.x)) {
-      return true;
-    } else {
-      return false;
-    }
-  }; // Méthode qui retourne un chiffre compris entre A et B
-
-
-  GameService.prototype.rangeNumber = function (a, b) {
-    return Math.floor(Math.random() * b) + a;
-  };
-
-  ; // Méthode qui renvoie une direction aléatoire
-
-  GameService.prototype.randomDirection = function () {
-    var randomNumber = this.rangeNumber(1, 4);
-    var direction = '';
-
-    switch (randomNumber) {
-      case 1:
-        direction = 'east';
-        break;
-
-      case 2:
-        direction = 'west';
-        break;
-
-      case 3:
-        direction = 'north';
-        break;
-
-      case 4:
-        direction = 'south';
-        break;
-    }
-
-    return direction;
-  };
-
-  return GameService;
-}();
-
-exports.GameService = GameService;
 },{}],"src/model/class/enemy.ts":[function(require,module,exports) {
 "use strict";
 
@@ -427,9 +319,6 @@ var index_1 = require("../../../index");
 var Enemy =
 /** @class */
 function () {
-  //direction: string;
-  //faceX = 0;
-  //faceY = 64;
   //currentLoopIndex = 0;
   //rightCycleLoop = [{faceX:0,faceY:64}, {faceX:32,faceY:64},{faceX:0,faceY:64},{faceX:64,faceY:64}];
   //leftCycleLoop = [{faceX:0,faceY:32}, {faceX:32,faceY:32},{faceX:0,faceY:32},{faceX:64,faceY:32}];
@@ -437,14 +326,17 @@ function () {
   //downCycleLoop = [{faceX:0,faceY:0}, {faceX:32,faceY:0},{faceX:0,faceY:0},{faceX:64,faceY:0}];
   // Constructeur de la classe des ennemies
   function Enemy(x, y) {
-    this.width = 48;
-    this.height = 48; //reference: string;
+    this.width = 64;
+    this.height = 64; //reference: string;
     //characterImg: Object;
     //mapIndexPosition = Math.floor(this.centerX / 48) + (60 * Math.floor(this.centerY / 48));
 
     this.speedX = 2;
     this.speedY = 2;
-    this.color = '#6BE44A'; //this.name = name;
+    this.color = '#6BE44A'; //direction: string;
+
+    this.faceX = 0;
+    this.faceY = 64; //this.name = name;
     //this.reference = reference;
     //this.characterImg = config.getImage(this.reference);
 
@@ -562,7 +454,225 @@ function () {
 }();
 
 exports.Enemy = Enemy;
-},{"../../../index":"index.ts"}],"src/model/class/viewport.ts":[function(require,module,exports) {
+},{"../../../index":"index.ts"}],"src/model/class/display-controller.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var player_1 = require("./player");
+
+var enemy_1 = require("./enemy");
+
+var DisplayController =
+/** @class */
+function () {
+  function DisplayController(canvas) {
+    this.canvas = canvas;
+    this.canvas.width = 800; //window.innerWidth;
+
+    this.canvas.height = 600; //window.innerHeight;
+
+    this.ctx = this.canvas.getContext('2d');
+  }
+
+  DisplayController.prototype.initCanvas = function () {};
+
+  DisplayController.prototype.draw = function (shape, data, player) {
+    var x = data.x,
+        y = data.y,
+        width = data.width,
+        height = data.height,
+        color = data.color;
+    console.log('draw');
+    this.ctx.fillStyle = color;
+
+    switch (shape) {
+      case 'rectangle':
+        this.ctx.fillRect(x - player.x, y, width, height);
+        break;
+
+      default:
+        this.ctx.fillRect(x, y, width, height);
+        break;
+    }
+  };
+
+  ;
+
+  DisplayController.prototype.drawSprite = function (characterImg, viewPort, sprite) {
+    // On va déterminer les coordonnées Y/Y du sprite à affichernsur le canvas
+    var canvasX;
+    var canvasY;
+
+    if (sprite instanceof player_1.Player) {
+      canvasX = this.canvas.width / 2 - sprite.width / 2;
+      canvasY = this.canvas.height - 256 - sprite.height;
+    }
+
+    if (sprite instanceof enemy_1.Enemy) {
+      canvasX = sprite.x - viewPort.x;
+      canvasY = sprite.y - viewPort.y;
+    }
+
+    this.ctx.drawImage(characterImg, sprite.faceX, // Position X de la partie à croper
+    sprite.faceY, // Position Y de la partie à croper
+    32, // Largeur de la partie à croper
+    32, // Hauteur de la partie à corper
+    canvasX, // on l'affiche toujours au milieu du canvas // Position x de l'image à croper sur le canvas
+    canvasY, // on l'affiche toujours au milieu du canvas // Position y de l'image à croper sur le canvas
+    sprite.width, // Largeur de la partie cropée
+    sprite.height // Hauteur de la partie cropée
+    );
+  };
+
+  ;
+
+  DisplayController.prototype.clear = function () {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  };
+
+  ;
+
+  DisplayController.prototype.drawBackground = function (backgroundImg, player) {
+    this.ctx.drawImage(backgroundImg, // Objet image représentant le background
+    player.x - this.canvas.width / 2, // Position X de la partie à croper
+    //player.y - 288.5, // Position Y de la partie à croper
+    0, // Position Y de la partie à croper
+    this.canvas.width, // Largeur de la partie à croper
+    this.canvas.height, // Hauteur de la partie à corper
+    0, // Position X sur le canvas de l'image cropée
+    0, // Position Y sur le canvas de l'image cropée
+    this.canvas.width, // Largeur de l'image cropée sur le canvas
+    this.canvas.height // Hauteur de l'image cropée sur le canvas
+    );
+  };
+
+  ;
+
+  DisplayController.prototype.drawImg = function (img, cropX, cropY, canvasX, canvasY) {
+    this.ctx.drawImage(img, // Objet image représentant le background
+    cropX, // Position X de la partie à croper
+    //player.y - 288.5, // Position Y de la partie à croper
+    cropY, // Position Y de la partie à croper
+    64, // Largeur de la partie à croper
+    64, // Hauteur de la partie à corper
+    canvasX, // Position X sur le canvas de l'image cropée
+    canvasY, // Position Y sur le canvas de l'image cropée
+    64, // Largeur de l'image cropée sur le canvas
+    64 // Hauteur de l'image cropée sur le canvas
+    );
+  };
+
+  DisplayController.prototype.resizeCanvas = function (event) {
+    console.log('event', event);
+    this.canvas.width = 800; //window.innerWidth;
+
+    this.canvas.height = 600; // window.innerHeight;
+  };
+
+  DisplayController.prototype.drawTxt = function (txt) {
+    this.ctx.font = "20px Arial";
+    this.ctx.fillText(txt, 10, 50);
+  };
+
+  return DisplayController;
+}();
+
+exports.DisplayController = DisplayController;
+},{"./player":"src/model/class/player.ts","./enemy":"src/model/class/enemy.ts"}],"src/model/class/input-controller.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var InputController =
+/** @class */
+function () {
+  function InputController() {
+    this.left = false;
+    this.right = false;
+    this.up = false;
+    this.kick = false;
+    this.isAttacking = false;
+  }
+
+  return InputController;
+}();
+
+exports.InputController = InputController;
+},{}],"src/model/class/game-service.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var GameService =
+/** @class */
+function () {
+  function GameService() {} // On vérifie s'il y a collusion entre deux sprites
+
+
+  GameService.prototype.checkCollision = function (a, b) {
+    // On vérifie si A et B sont sur la même mapsheet et s'il y a collision
+    if (b.x > a.x + a.width || b.x < a.x - b.width || b.y > a.y + a.height || b.y < a.y - b.height) {
+      // Pas de collision
+      return false;
+    } else {
+      // collision
+      return true;
+    }
+  }; // On réagit à la collision
+
+
+  GameService.prototype.handleCollision = function (a, b) {
+    if (a.y + a.height < b.y + 20 && a.y + a.height > b.y && (a.x + a.width > b.x && a.x + a.width < b.x + b.width || a.x < b.x + b.width && a.x > b.x)) {
+      return true;
+    } else {
+      return false;
+    }
+  }; // Méthode qui retourne un chiffre compris entre A et B
+
+
+  GameService.prototype.rangeNumber = function (a, b) {
+    return Math.floor(Math.random() * b) + a;
+  };
+
+  ; // Méthode qui renvoie une direction aléatoire
+
+  GameService.prototype.randomDirection = function () {
+    var randomNumber = this.rangeNumber(1, 4);
+    var direction = '';
+
+    switch (randomNumber) {
+      case 1:
+        direction = 'east';
+        break;
+
+      case 2:
+        direction = 'west';
+        break;
+
+      case 3:
+        direction = 'north';
+        break;
+
+      case 4:
+        direction = 'south';
+        break;
+    }
+
+    return direction;
+  };
+
+  return GameService;
+}();
+
+exports.GameService = GameService;
+},{}],"src/model/class/viewport.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -630,15 +740,17 @@ var inputController = new input_controller_1.InputController();
 var viewPort = new viewport_1.ViewPort(0, 0, 800, 600);
 exports.gameService = new game_service_1.GameService();
 var enemiesList = [];
-var mapArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
+var mapArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4, 5, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
 var tileSetImg = document.getElementById('tileset');
+var playerImg = document.getElementById('heros6');
+var enemyImg = document.getElementById('personnage-important2');
 var collideBrick; // Méthode pour créer des ennemis
 
 var initEnemies = function initEnemies(count) {
   // 0n crée plusieurs ennemis
   for (var i = 0; i < count; i++) {
-    var x = exports.gameService.rangeNumber(1, 600);
-    var y = exports.gameService.rangeNumber(1, 800);
+    var x = exports.gameService.rangeNumber(400, 1500);
+    var y = 640;
     enemiesList = __spreadArrays(enemiesList, [new enemy_1.Enemy(x, y)]);
   }
 };
@@ -704,8 +816,6 @@ canvas.addEventListener("touchend", handleEnd, false); // canvas.addEventListene
 // L'animation générale
 
 function loop() {
-  var savedPlayerX = player.x;
-  var savedPlayerY = player.y;
   displayController.clear(); //displayController.drawBackground(backGroundImg, player);
 
   var columNb = 80;
@@ -751,14 +861,26 @@ function loop() {
           cropX = 384;
           cropY = 0;
           break;
+
+        case 4:
+          cropX = 320;
+          cropY = 256;
+          break;
+
+        case 5:
+          cropX = 384;
+          cropY = 256;
+          break;
       }
 
-      displayController.drawImg(tileSetImg, cropX, cropY, canvasX, canvasY);
+      if (value !== 0) {
+        displayController.drawImg(tileSetImg, cropX, cropY, canvasX, canvasY);
+      }
     }
   }
 
   player.update(inputController);
-  displayController.drawSprite(playerImg, player);
+  displayController.drawSprite(playerImg, viewPort, player);
   viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
 
   for (var i = 0; i < mapArray.length; i++) {
@@ -800,14 +922,14 @@ function loop() {
   } // if (inputController.isAttacking){
   //     displayController.draw('rectangle', player.damageZone);
   // }
-  // enemiesList.forEach((enemy, index) => {
-  //     displayController.draw('rectangle', enemy);
-  //     if(player.damageZone && gameService.checkCollision(player.damageZone, enemy)){
-  //         alert('collision entre ennemi et damagezone');
-  //         enemiesList.splice(index, 1); 
-  //     }
-  // });
-  //On itère sur la liste des briques
+
+
+  enemiesList.forEach(function (enemy, index) {
+    displayController.drawSprite(enemyImg, viewPort, enemy); // if(player.damageZone && gameService.checkCollision(player.damageZone, enemy)){
+    //     alert('collision entre ennemi et damagezone');
+    //     enemiesList.splice(index, 1); 
+    // }
+  }); //On itère sur la liste des briques
   // brickList.forEach(brick=> {
   //     displayController.draw('rectangle', brick, player);
   //     // if (gameService.checkCollision(brick, player)){ // Si collision entre la brique et le player
@@ -819,7 +941,6 @@ function loop() {
   //         player.setJump(false);
   //     };
   // });
-
 
   window.requestAnimationFrame(loop);
 } // fetch('/levels.json').then(data=> {
@@ -850,11 +971,6 @@ function loop() {
 // };
 //console.log(tileSetImg)
 
-
-var playerImg = new Image();
-playerImg.src = 'https://www.pngkey.com/png/full/344-3448121_best-of-sprite-sheet-png-terraria-character-sprite.png';
-
-playerImg.onload = function () {};
 
 window.addEventListener('resize', displayController.resizeCanvas, false);
 window.addEventListener('orientationchange', displayController.resizeCanvas, false);
@@ -887,7 +1003,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64956" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49309" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
