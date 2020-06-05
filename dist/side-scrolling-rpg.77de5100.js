@@ -117,12 +117,36 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/model/class/player.ts":[function(require,module,exports) {
+})({"src/model/class/damage-zone.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var DamageZone =
+/** @class */
+function () {
+  function DamageZone(x, y, width, height) {
+    this.color = '#DC33B8';
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+  }
+
+  return DamageZone;
+}();
+
+exports.DamageZone = DamageZone;
+},{}],"src/model/class/player.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var damage_zone_1 = require("./damage-zone");
 
 var Player =
 /** @class */
@@ -133,11 +157,13 @@ function () {
     this.width = 64;
     this.height = 64;
     this.jump = false;
-    this.speedX = 5;
-    this.speedY = 5;
+    this.speedX = 0;
+    this.speedY = 0;
     this.color = '#E44C4A';
+    this.formerDirection = 'standing';
     this.groundY = 704;
     this.currentLoopIndex = 0;
+    this.currentCycleLoop = [];
     this.rightCycleLoop = [{
       faceX: 0,
       faceY: 64
@@ -197,11 +223,13 @@ function () {
   }
 
   Player.prototype.update = function (input) {
-    if (input.isAttacking) {
-      // Si le joueur attaque
-      this.attack();
-    }
-
+    // if (input.attack){ // Si le joueur attaque
+    //     this.attack(true);
+    // } else if (this.isAttacking && this.attackTimeFrame < 60){
+    //     this.attackTimeFrame++;
+    // } else {
+    //     this.attack(false);
+    // }
     if (input.up && this.jump === false) {
       this.speedY = 230;
       this.jump = true;
@@ -212,28 +240,23 @@ function () {
     this.x += this.speedX;
 
     if (input.left) {
-      this.speedX = -1; //this.x += this.speedX;
-
-      this.setFaceCrop('left');
+      this.speedX = -1;
+      this.formerDirection = 'left';
     }
 
     if (input.right) {
-      this.speedX = 1; //this.x += this.speedX;
-
-      this.setFaceCrop('right');
+      this.speedX = 1;
+      this.formerDirection = 'right';
     }
 
     this.speedY = 1;
     this.y += this.speedY;
 
     if (this.y + this.height > this.groundY) {
+      // Si le player se trouve plus bas que palier
       this.y = this.groundY - 64;
       this.jump = false;
-    } // if (this.y > 700){ // Si le player se trouve plus bas que palier
-    //     this.jump = false;
-    //     this.y = 700;
-    // }
-
+    }
 
     if (this.x < 300) {
       // On empeche le joueur d'aller au bord gauche de la map courante
@@ -242,6 +265,9 @@ function () {
       // On empeche le joueur d'aller au bord droit de la map courante
       this.x = this.x - 10;
     }
+
+    this.updateFaceCrop(input);
+    this.updateDamageZone(input);
   };
 
   Player.prototype.setPosition = function (x, y) {
@@ -257,19 +283,13 @@ function () {
   }; // Méthode appelée quand le bouton d'action est touchée
 
 
-  Player.prototype.attack = function () {
-    console.log('attack');
-    this.damageZone = {
-      x: this.x + this.width / 2,
-      y: this.y - this.height / 2,
-      width: this.width,
-      height: this.height,
-      color: '#DC7633'
-    };
+  Player.prototype.attack = function (status) {
+    this.isAttacking = status;
+    this.attackTimeFrame = 0;
   }; // Méthode pour définir les coordonnées de la posture à croper
 
 
-  Player.prototype.setFaceCrop = function (direction) {
+  Player.prototype.updateFaceCrop = function (input) {
     // On incrémente le compteur de pas
     if (this.currentLoopIndex < 3) {
       this.currentLoopIndex++;
@@ -277,37 +297,55 @@ function () {
       this.currentLoopIndex = 0;
     }
 
-    var cycle;
-
-    switch (direction) {
-      case 'left':
-        cycle = this.leftCycleLoop;
-        break;
-
-      case 'right':
-        cycle = this.rightCycleLoop;
-        break;
-
-      case 'up':
-        cycle = this.upCycleLoop;
-        break;
-
-      case 'down':
-        cycle = this.upCycleLoop;
-        break;
+    if (input.left) {
+      this.currentCycleLoop = this.leftCycleLoop;
+    } else if (input.right) {
+      this.currentCycleLoop = this.rightCycleLoop;
     }
 
-    this.faceX = cycle[this.currentLoopIndex].faceX;
-    this.faceY = cycle[this.currentLoopIndex].faceY;
-  };
+    if (this.formerDirection === 'right' && this.speedX < 0.1) {
+      // A l'arret vers la droite
+      this.faceX = 0;
+      this.faceY = 64;
+    } else if (this.formerDirection === 'left' && this.speedX > -0.1) {
+      // A l'arret la gauche
+      this.faceX = 0;
+      this.faceY = 32;
+    } else if (this.formerDirection === 'standing' && this.speedX < 0.1) {
+      this.faceX = 0;
+      this.faceY = 64;
+    } else {
+      // Il avance
+      this.faceX = this.currentCycleLoop[this.currentLoopIndex].faceX;
+      this.faceY = this.currentCycleLoop[this.currentLoopIndex].faceY;
+    }
 
-  Player.prototype.updateDamageZone = function () {};
+    console.log('this.formerDirection', this.formerDirection);
+    console.log('this.speedX', this.speedX);
+  }; // On met à jour la zone d'attaque devant le joueur
+
+
+  Player.prototype.updateDamageZone = function (input) {
+    var x;
+    var y = this.y - this.height / 2;
+
+    if (this.formerDirection === 'left') {
+      // Si direction vers la gauche
+      x = this.x - this.width / 2;
+    } else if (this.formerDirection === 'right') {
+      // Si direction vers la droite
+      x = this.x + this.width / 2;
+    }
+
+    this.damageZone = new damage_zone_1.DamageZone(x, y, this.width, this.height);
+    console.log('this.damageZone', this.damageZone);
+  };
 
   return Player;
 }();
 
 exports.Player = Player;
-},{}],"src/model/class/enemy.ts":[function(require,module,exports) {
+},{"./damage-zone":"src/model/class/damage-zone.ts"}],"src/model/class/enemy.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -479,18 +517,18 @@ function () {
 
   DisplayController.prototype.initCanvas = function () {};
 
-  DisplayController.prototype.draw = function (shape, data, player) {
-    var x = data.x,
-        y = data.y,
-        width = data.width,
-        height = data.height,
-        color = data.color;
+  DisplayController.prototype.draw = function (shape, viewPort, sprite) {
+    var x = sprite.x,
+        y = sprite.y,
+        width = sprite.width,
+        height = sprite.height,
+        color = sprite.color;
     console.log('draw');
     this.ctx.fillStyle = color;
 
     switch (shape) {
       case 'rectangle':
-        this.ctx.fillRect(x - player.x, y, width, height);
+        this.ctx.fillRect(x - viewPort.x, y - viewPort.y, width, height);
         break;
 
       default:
@@ -595,8 +633,8 @@ function () {
     this.left = false;
     this.right = false;
     this.up = false;
-    this.kick = false;
-    this.isAttacking = false;
+    this.down = false;
+    this.attack = false;
   }
 
   return InputController;
@@ -800,6 +838,7 @@ var handleStart = function handleStart(event) {
   } else if (+event.targetTouches[0].clientX > 200 && +event.targetTouches[0].clientX < 400) {
     inputController.left = false;
     inputController.right = true;
+    inputController.attack = true;
   }
 };
 
@@ -882,6 +921,7 @@ function loop() {
   player.update(inputController);
   displayController.drawSprite(playerImg, viewPort, player);
   viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
+  displayController.draw('rectangle', viewPort, player.damageZone);
 
   for (var i = 0; i < mapArray.length; i++) {
     indexRaw = Math.floor(i / columNb);
@@ -922,14 +962,14 @@ function loop() {
   } // if (inputController.isAttacking){
   //     displayController.draw('rectangle', player.damageZone);
   // }
-
-
-  enemiesList.forEach(function (enemy, index) {
-    displayController.drawSprite(enemyImg, viewPort, enemy); // if(player.damageZone && gameService.checkCollision(player.damageZone, enemy)){
-    //     alert('collision entre ennemi et damagezone');
-    //     enemiesList.splice(index, 1); 
-    // }
-  }); //On itère sur la liste des briques
+  // enemiesList.forEach((enemy, index) => {
+  //     displayController.drawSprite(enemyImg, viewPort, enemy);
+  //     // if(player.damageZone && gameService.checkCollision(player.damageZone, enemy)){
+  //     //     alert('collision entre ennemi et damagezone');
+  //     //     enemiesList.splice(index, 1); 
+  //     // }
+  // });
+  //On itère sur la liste des briques
   // brickList.forEach(brick=> {
   //     displayController.draw('rectangle', brick, player);
   //     // if (gameService.checkCollision(brick, player)){ // Si collision entre la brique et le player
@@ -941,6 +981,7 @@ function loop() {
   //         player.setJump(false);
   //     };
   // });
+
 
   window.requestAnimationFrame(loop);
 } // fetch('/levels.json').then(data=> {
@@ -1003,7 +1044,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49309" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50708" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

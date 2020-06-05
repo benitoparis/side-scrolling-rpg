@@ -13,13 +13,17 @@ export class Player {
     width=64;
     height=64;
     jump = false;
-    speedX=5;
-    speedY=5;
+    speedX=0;
+    speedY=0;
     color= '#E44C4A';
+    formerDirection = 'standing';
     isAttacking: boolean;
+    attackTimeFrame: number;
     damageZone: DamageZone;
+    
     groundY = 704;
     currentLoopIndex = 0;
+    currentCycleLoop = [];
     rightCycleLoop = [{faceX:0,faceY:64}, {faceX:32,faceY:64},{faceX:0,faceY:64},{faceX:64,faceY:64}];
     leftCycleLoop = [{faceX:0,faceY:32}, {faceX:32,faceY:32},{faceX:0,faceY:32},{faceX:64,faceY:32}];
     upCycleLoop = [{faceX:0,faceY:96}, {faceX:32,faceY:96},{faceX:0,faceY:96},{faceX:64,faceY:96}];
@@ -33,15 +37,17 @@ export class Player {
         this.y= y;
         this.centerX = (this.x + this.width / 2);
         this.centerY = (this.y + this.height / 2);
-        this.damageZone = 
     }
 
     update(input: InputController){
 
-
-        if(input.isAttacking){ // Si le joueur attaque
-            this.attack();
-        }
+        // if (input.attack){ // Si le joueur attaque
+        //     this.attack(true);
+        // } else if (this.isAttacking && this.attackTimeFrame < 60){
+        //     this.attackTimeFrame++;
+        // } else {
+        //     this.attack(false);
+        // }
 
         if (input.up && this.jump === false){
             this.speedY = 230;
@@ -54,35 +60,32 @@ export class Player {
 
         if (input.left){
             this.speedX = -1;
-            //this.x += this.speedX;
+            this.formerDirection = 'left';
+           
         }
 
         if (input.right){
             this.speedX = 1;
-            //this.x += this.speedX;
+            this.formerDirection = 'right';
         }
         
         this.speedY = 1;
         this.y += this.speedY;
 
         
-        if ((this.y + this.height) > this.groundY){
+        if ((this.y + this.height) > this.groundY){ // Si le player se trouve plus bas que palier
              this.y = this.groundY - 64;
              this.jump = false;
         }
 
-        // if (this.y > 700){ // Si le player se trouve plus bas que palier
-        //     this.jump = false;
-        //     this.y = 700;
-        // }
-
         if (this.x < 300) { // On empeche le joueur d'aller au bord gauche de la map courante
             this.x = this.x + 10;
-        } else if(this.x > 4000){ // On empeche le joueur d'aller au bord droit de la map courante
+        } else if (this.x > 4000){ // On empeche le joueur d'aller au bord droit de la map courante
             this.x = this.x - 10; 
         }
 
-      this.updateFaceCrop(input);
+        this.updateFaceCrop(input);
+        this.updateDamageZone(input);
     }
 
     setPosition(x: number, y: number){
@@ -100,6 +103,7 @@ export class Player {
     // Méthode appelée quand le bouton d'action est touchée
     attack(status : boolean): void {
         this.isAttacking = status;
+        this.attackTimeFrame = 0;
     }
 
     // Méthode pour définir les coordonnées de la posture à croper
@@ -108,24 +112,34 @@ export class Player {
         // On incrémente le compteur de pas
         if (this.currentLoopIndex < 3){
             this.currentLoopIndex++
-        } else if(this.currentLoopIndex === 3){
+        } else if (this.currentLoopIndex === 3){
             this.currentLoopIndex = 0;
         }
-        
-        let cycle: any[];
 
         if (input.left){
-            cycle = this.leftCycleLoop;
+            this.currentCycleLoop = this.leftCycleLoop;
         } else if (input.right){
-            cycle = this.rightCycleLoop;
-        } else if(input.up){
-            cycle = this.upCycleLoop;
-        } else if (input.up){
-            cycle = this.upCycleLoop;
+            this.currentCycleLoop = this.rightCycleLoop;
         }
-        
-        this.faceX = cycle[this.currentLoopIndex].faceX;
-        this.faceY = cycle[this.currentLoopIndex].faceY;
+
+        if (this.formerDirection === 'right' && this.speedX < 0.1 ){ // A l'arret vers la droite
+            this.faceX = 0;
+            this.faceY = 64;
+        } else if (this.formerDirection === 'left' && this.speedX > -0.1) { // A l'arret la gauche
+            this.faceX = 0;
+            this.faceY = 32;
+        } else if(this.formerDirection === 'standing' && this.speedX < 0.1) {
+            this.faceX = 0;
+            this.faceY = 64;
+        } else { // Il avance
+            this.faceX = this.currentCycleLoop[this.currentLoopIndex].faceX;
+            this.faceY = this.currentCycleLoop[this.currentLoopIndex].faceY;
+        }
+
+        console.log('this.formerDirection', this.formerDirection);
+        console.log('this.speedX', this.speedX);
+
+
     }
 
     // On met à jour la zone d'attaque devant le joueur
@@ -134,12 +148,13 @@ export class Player {
         let x: number
         let y = this.y - this.height /2;
 
-        if (input.left) { // Si direction vers la gauche
+        if (this.formerDirection === 'left') { // Si direction vers la gauche
             x = this.x - this.width / 2;
-        } else if (input.right){ // Si direction vers la droite
+        } else if (this.formerDirection === 'right'){ // Si direction vers la droite
             x = this.x + this.width / 2;
         }
 
         this.damageZone = new DamageZone(x, y, this.width, this.height);
+        console.log('this.damageZone', this.damageZone);
     }
 }

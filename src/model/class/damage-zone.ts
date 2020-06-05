@@ -6,6 +6,7 @@ export class DamageZone implements sprite {
     y: number;
     width: number;
     height: number;
+    color = '#DC33B8';
 
     constructor(x, y, width, height){
         this.x = x;

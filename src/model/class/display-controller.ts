@@ -22,9 +22,9 @@ export class DisplayController {
      
     }
 
-    draw(shape: string, data: sprite, player: sprite): void {
+    draw(shape: string, viewPort: ViewPort, sprite: sprite): void {
 
-        const {x, y, width, height, color } = data;
+        const {x, y, width, height, color } = sprite;
 
         console.log('draw');
         this.ctx.fillStyle = color;
@@ -33,8 +33,8 @@ export class DisplayController {
 
             case 'rectangle':
                 this.ctx.fillRect(
-                    x - player.x,
-                    y,
+                    x - viewPort.x,
+                    y - viewPort.y,
                     width,
                     height
                 );

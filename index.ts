@@ -109,6 +109,7 @@ let handleStart = (event) =>{
     } else if(+event.targetTouches[0].clientX > 200 && +event.targetTouches[0].clientX < 400) {
         inputController.left = false;
         inputController.right = true;
+        inputController.attack = true;
     }
     
 
@@ -202,7 +203,7 @@ function loop() {
     displayController.drawSprite(playerImg, viewPort, player);
     viewPort.defineViewPoint(player.x - ((800 / 2) - player.width / 2), (player.y - (600/2) + 20), 800, 600);
 
-
+    displayController.draw('rectangle',viewPort,player.damageZone);
 
     for (let i = 0; i < mapArray.length; i++){
         
@@ -238,16 +239,13 @@ function loop() {
                 
             } else {
                 
-
                 player.groundY = 704;
                 player.update(inputController);
-                const txt= `player.x : ${player.x}, player.y : ${player.y }`;
+                const txt= `player.x : ${player.x}, player.y : ${player.y}`;
                 displayController.drawTxt(txt);
 
                 viewPort.defineViewPoint(player.x - ((800 / 2) - player.width / 2), (player.y - (600/2) + 20), 800, 600);
 
-                
-               
             }
             
         }
@@ -260,14 +258,14 @@ function loop() {
     //     displayController.draw('rectangle', player.damageZone);
     // }
     
-    enemiesList.forEach((enemy, index) => {
-        displayController.drawSprite(enemyImg, viewPort, enemy);
+    // enemiesList.forEach((enemy, index) => {
+    //     displayController.drawSprite(enemyImg, viewPort, enemy);
 
-        // if(player.damageZone && gameService.checkCollision(player.damageZone, enemy)){
-        //     alert('collision entre ennemi et damagezone');
-        //     enemiesList.splice(index, 1); 
-        // }
-    });
+    //     // if(player.damageZone && gameService.checkCollision(player.damageZone, enemy)){
+    //     //     alert('collision entre ennemi et damagezone');
+    //     //     enemiesList.splice(index, 1); 
+    //     // }
+    // });
     
 
   
