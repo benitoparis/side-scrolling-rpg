@@ -45,24 +45,21 @@ export class GameService {
 
     // Méthode qui renvoie une direction aléatoire
     randomDirection(){
-        const randomNumber = this.rangeNumber(1,4);
+        const randomNumber = this.rangeNumber(1,2);
+        console.log('randomNumber', randomNumber);
         let direction = '';
 
         switch(randomNumber){
-        case 1:
-            direction = 'east';
-            break;
-        case 2:
-            direction = 'west';
-            break;
-        case 3:
-            direction = 'north';
-            break;
-        case 4:
-            direction = 'south';
-            break;
+            case 1:
+                direction = 'right';
+                break;
+            case 2:
+                direction = 'left';
+                break;
+            default:
+                direction = 'right';
+                break;
         }
-
         return direction;
     }
 

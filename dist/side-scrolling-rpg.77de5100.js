@@ -160,7 +160,7 @@ function () {
     this.speedX = 0;
     this.speedY = 0;
     this.color = '#E44C4A';
-    this.formerDirection = 'standing';
+    this.currentDirection = 'standing';
     this.groundY = 704;
     this.currentLoopIndex = 0;
     this.currentCycleLoop = [];
@@ -223,34 +223,35 @@ function () {
   }
 
   Player.prototype.update = function (input) {
-    // if (input.attack){ // Si le joueur attaque
-    //     this.attack(true);
-    // } else if (this.isAttacking && this.attackTimeFrame < 60){
-    //     this.attackTimeFrame++;
-    // } else {
-    //     this.attack(false);
-    // }
+    if (input.attack) {
+      // Si le joueur attaque
+      this.attack(true);
+    } else if (this.isAttacking && this.attackTimeFrame < 60) {
+      this.attackTimeFrame++;
+    } else {
+      this.attack(false);
+    }
+
     if (input.up && this.jump === false) {
       this.speedY = 230;
       this.jump = true;
       this.y -= this.speedY;
     }
 
-    this.speedX = this.speedX * 0.90;
-    this.x += this.speedX;
-
     if (input.left) {
       this.speedX = -1;
-      this.formerDirection = 'left';
+      this.currentDirection = 'left';
     }
 
     if (input.right) {
       this.speedX = 1;
-      this.formerDirection = 'right';
+      this.currentDirection = 'right';
     }
 
     this.speedY = 1;
     this.y += this.speedY;
+    this.speedX = this.speedX * 0.90;
+    this.x += this.speedX;
 
     if (this.y + this.height > this.groundY) {
       // Si le player se trouve plus bas que palier
@@ -267,7 +268,7 @@ function () {
     }
 
     this.updateFaceCrop(input);
-    this.updateDamageZone(input);
+    this.updateDamageZone();
   };
 
   Player.prototype.setPosition = function (x, y) {
@@ -303,15 +304,15 @@ function () {
       this.currentCycleLoop = this.rightCycleLoop;
     }
 
-    if (this.formerDirection === 'right' && this.speedX < 0.1) {
+    if (this.currentDirection === 'right' && this.speedX < 0.1) {
       // A l'arret vers la droite
       this.faceX = 0;
       this.faceY = 64;
-    } else if (this.formerDirection === 'left' && this.speedX > -0.1) {
+    } else if (this.currentDirection === 'left' && this.speedX > -0.1) {
       // A l'arret la gauche
       this.faceX = 0;
       this.faceY = 32;
-    } else if (this.formerDirection === 'standing' && this.speedX < 0.1) {
+    } else if (this.currentDirection === 'standing' && this.speedX < 0.1) {
       this.faceX = 0;
       this.faceY = 64;
     } else {
@@ -319,26 +320,22 @@ function () {
       this.faceX = this.currentCycleLoop[this.currentLoopIndex].faceX;
       this.faceY = this.currentCycleLoop[this.currentLoopIndex].faceY;
     }
-
-    console.log('this.formerDirection', this.formerDirection);
-    console.log('this.speedX', this.speedX);
   }; // On met à jour la zone d'attaque devant le joueur
 
 
-  Player.prototype.updateDamageZone = function (input) {
+  Player.prototype.updateDamageZone = function () {
     var x;
     var y = this.y - this.height / 2;
 
-    if (this.formerDirection === 'left') {
+    if (this.currentDirection === 'left') {
       // Si direction vers la gauche
       x = this.x - this.width / 2;
-    } else if (this.formerDirection === 'right') {
+    } else if (this.currentDirection === 'right') {
       // Si direction vers la droite
       x = this.x + this.width / 2;
     }
 
     this.damageZone = new damage_zone_1.DamageZone(x, y, this.width, this.height);
-    console.log('this.damageZone', this.damageZone);
   };
 
   return Player;
@@ -352,18 +349,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var index_1 = require("../../../index");
-
 var Enemy =
 /** @class */
 function () {
-  //currentLoopIndex = 0;
-  //rightCycleLoop = [{faceX:0,faceY:64}, {faceX:32,faceY:64},{faceX:0,faceY:64},{faceX:64,faceY:64}];
-  //leftCycleLoop = [{faceX:0,faceY:32}, {faceX:32,faceY:32},{faceX:0,faceY:32},{faceX:64,faceY:32}];
-  //upCycleLoop = [{faceX:0,faceY:96}, {faceX:32,faceY:96},{faceX:0,faceY:96},{faceX:64,faceY:96}];
-  //downCycleLoop = [{faceX:0,faceY:0}, {faceX:32,faceY:0},{faceX:0,faceY:0},{faceX:64,faceY:0}];
   // Constructeur de la classe des ennemies
-  function Enemy(x, y) {
+  function Enemy(x, y, gameService) {
     this.width = 64;
     this.height = 64; //reference: string;
     //characterImg: Object;
@@ -371,10 +361,63 @@ function () {
 
     this.speedX = 2;
     this.speedY = 2;
-    this.color = '#6BE44A'; //direction: string;
-
+    this.color = '#6BE44A';
     this.faceX = 0;
-    this.faceY = 64; //this.name = name;
+    this.faceY = 64;
+    this.currentLoopIndex = 0;
+    this.currentCycleLoop = [];
+    this.rightCycleLoop = [{
+      faceX: 0,
+      faceY: 64
+    }, {
+      faceX: 32,
+      faceY: 64
+    }, {
+      faceX: 0,
+      faceY: 64
+    }, {
+      faceX: 64,
+      faceY: 64
+    }];
+    this.leftCycleLoop = [{
+      faceX: 0,
+      faceY: 32
+    }, {
+      faceX: 32,
+      faceY: 32
+    }, {
+      faceX: 0,
+      faceY: 32
+    }, {
+      faceX: 64,
+      faceY: 32
+    }];
+    this.upCycleLoop = [{
+      faceX: 0,
+      faceY: 96
+    }, {
+      faceX: 32,
+      faceY: 96
+    }, {
+      faceX: 0,
+      faceY: 96
+    }, {
+      faceX: 64,
+      faceY: 96
+    }];
+    this.downCycleLoop = [{
+      faceX: 0,
+      faceY: 0
+    }, {
+      faceX: 32,
+      faceY: 0
+    }, {
+      faceX: 0,
+      faceY: 0
+    }, {
+      faceX: 64,
+      faceY: 0
+    }]; //this.name = name;
     //this.reference = reference;
     //this.characterImg = config.getImage(this.reference);
 
@@ -385,17 +428,19 @@ function () {
     this.y = y; // Position Y sur la map
 
     this.centerX = this.x + this.width / 2;
-    this.centerY = this.y + this.height / 2; // let that  = this;
-    // this.autoMove = setInterval(() => { that.setRandomDirection();}, 2000);
-    //this.direction = 'south';
+    this.centerY = this.y + this.height / 2;
+    this.gameService = gameService;
+    var that = this;
+    this.autoMove = setInterval(function () {
+      that.setRandomDirection();
+    }, 3000);
+    this.currentDirection = 'left';
   } // Méthode qui va modifier les coordonnées du people.
 
 
   Enemy.prototype.update = function () {
-    this.setCurrentLoopIndex();
-
-    switch (this.direction) {
-      case 'east':
+    switch (this.currentDirection) {
+      case 'right':
         this.speedX = 2;
         this.x = this.x + this.speedX; // On détermine la positon x/y du crop du personnage
 
@@ -403,37 +448,36 @@ function () {
         this.faceY = this.rightCycleLoop[this.currentLoopIndex].faceY;
         break;
 
-      case 'west':
+      case 'left':
         this.speedX = 2;
         this.x = this.x - this.speedX; // On détermine la positon x/y du crop du personnage
 
         this.faceX = this.leftCycleLoop[this.currentLoopIndex].faceX;
         this.faceY = this.leftCycleLoop[this.currentLoopIndex].faceY;
         break;
-
-      case 'north':
-        this.speedY = 2;
-        this.y = this.y - this.speedY; // On détermine la positon x/y du crop du personnage
-
-        this.faceX = this.upCycleLoop[this.currentLoopIndex].faceX;
-        this.faceY = this.upCycleLoop[this.currentLoopIndex].faceY;
-        break;
-
-      case 'south':
-        this.speedY = 2;
-        this.y = this.y + this.speedY; // On détermine la positon x/y du crop du personnage
-
-        this.faceX = this.downCycleLoop[this.currentLoopIndex].faceX;
-        this.faceY = this.downCycleLoop[this.currentLoopIndex].faceY;
-        break;
+      // case 'north':
+      //   this.speedY = 2;
+      //   this.y = (this.y - this.speedY);
+      //   // On détermine la positon x/y du crop du personnage
+      //   this.faceX = this.upCycleLoop[this.currentLoopIndex].faceX;
+      //   this.faceY = this.upCycleLoop[this.currentLoopIndex].faceY;
+      //   break;
+      // case 'south':
+      //   this.speedY = 2;
+      //   this.y = (this.y + this.speedY);
+      //   // On détermine la positon x/y du crop du personnage
+      //   this.faceX = this.downCycleLoop[this.currentLoopIndex].faceX;
+      //   this.faceY = this.downCycleLoop[this.currentLoopIndex].faceY;
+      //   break;
 
       default:
         alert('default update');
         break;
     }
 
+    this.updateFaceCrop();
     this.setCenter();
-    this.setMapIndexPosition();
+    console.log('this.x', this.x);
   }; // Réinitialise les cordonnées x /y du people
 
 
@@ -444,7 +488,8 @@ function () {
 
 
   Enemy.prototype.setRandomDirection = function () {
-    this.direction = index_1.gameService.randomDirection();
+    this.currentDirection = this.gameService.randomDirection();
+    console.log('setRandomDirection this.currentDirection', this.currentDirection);
   }; // On recalcule le centre du people
 
 
@@ -452,26 +497,6 @@ function () {
     // On recalcule le centre du people
     this.centerX = this.x + this.width - this.width / 2;
     this.centerY = this.y + this.height - this.height / 2;
-  }; // Méthode qui renseigne l'index de la séquence de marche
-
-
-  Enemy.prototype.setCurrentLoopIndex = function () {
-    if (this.frame === this.fps) {
-      this.frame = 0;
-    } else {
-      this.frame++;
-    } // On détermine quel sprite afficher
-
-
-    if (this.frame % 3 === 0) {
-      // on décide d'incrémenter l'index toutes les 3 frames
-      this.currentLoopIndex++;
-    } // Si l'index est supérieur au nombre de position possible on le repositionne à zero
-
-
-    if (this.currentLoopIndex >= this.rightCycleLoop.length) {
-      this.currentLoopIndex = 0;
-    }
   }; // Méthode pour réinitialiser la position du people dans la map
 
 
@@ -479,20 +504,51 @@ function () {
     this.x = destination.x;
     this.y = destination.y; //this.currentWorldPosition =  new WorldPosition(destination.worldId,destination.mapSheetId );
 
-    this.setCenter();
-    this.setMapIndexPosition();
+    this.setCenter(); //this.setMapIndexPosition();
   }; // Méthode pour setter l'index du figuant sur la map
 
 
-  Enemy.prototype.setMapIndexPosition = function () {
-    this.mapIndexPosition = Math.floor(this.centerX / 48) + 60 * Math.floor(this.centerY / 48);
+  Enemy.prototype.setMapIndexPosition = function () {//this.mapIndexPosition = Math.floor(this.centerX / 48) + (60 * Math.floor(this.centerY / 48));
+  }; // Méthode pour définir les coordonnées de la posture à croper
+
+
+  Enemy.prototype.updateFaceCrop = function () {
+    // On incrémente le compteur de pas
+    if (this.currentLoopIndex < 3) {
+      this.currentLoopIndex++;
+    } else if (this.currentLoopIndex === 3) {
+      this.currentLoopIndex = 0;
+    }
+
+    if (this.currentDirection === 'left') {
+      this.currentCycleLoop = this.leftCycleLoop;
+    } else if (this.currentDirection === 'right') {
+      this.currentCycleLoop = this.rightCycleLoop;
+    }
+
+    if (this.currentDirection === 'right' && this.speedX < 0.1) {
+      // A l'arret vers la droite
+      this.faceX = 0;
+      this.faceY = 64;
+    } else if (this.currentDirection === 'left' && this.speedX > -0.1) {
+      // A l'arret la gauche
+      this.faceX = 0;
+      this.faceY = 32;
+    } else if (this.currentDirection === 'standing' && this.speedX < 0.1) {
+      this.faceX = 0;
+      this.faceY = 64;
+    } else {
+      // Il avance
+      this.faceX = this.currentCycleLoop[this.currentLoopIndex].faceX;
+      this.faceY = this.currentCycleLoop[this.currentLoopIndex].faceY;
+    }
   };
 
   return Enemy;
 }();
 
 exports.Enemy = Enemy;
-},{"../../../index":"index.ts"}],"src/model/class/display-controller.ts":[function(require,module,exports) {
+},{}],"src/model/class/display-controller.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -682,24 +738,21 @@ function () {
   ; // Méthode qui renvoie une direction aléatoire
 
   GameService.prototype.randomDirection = function () {
-    var randomNumber = this.rangeNumber(1, 4);
+    var randomNumber = this.rangeNumber(1, 2);
+    console.log('randomNumber', randomNumber);
     var direction = '';
 
     switch (randomNumber) {
       case 1:
-        direction = 'east';
+        direction = 'right';
         break;
 
       case 2:
-        direction = 'west';
+        direction = 'left';
         break;
 
-      case 3:
-        direction = 'north';
-        break;
-
-      case 4:
-        direction = 'south';
+      default:
+        direction = 'right';
         break;
     }
 
@@ -789,7 +842,7 @@ var initEnemies = function initEnemies(count) {
   for (var i = 0; i < count; i++) {
     var x = exports.gameService.rangeNumber(400, 1500);
     var y = 640;
-    enemiesList = __spreadArrays(enemiesList, [new enemy_1.Enemy(x, y)]);
+    enemiesList = __spreadArrays(enemiesList, [new enemy_1.Enemy(x, y, exports.gameService)]);
   }
 };
 
@@ -831,14 +884,11 @@ var handleStart = function handleStart(event) {
   if (+event.targetTouches[0].clientX > 400 && +event.targetTouches[0].clientY < 300) {
     inputController.up = true;
   } else if (+event.targetTouches[0].clientX > 400 && +event.targetTouches[0].clientY > 300) {
-    inputController.isAttacking = true;
+    inputController.attack = true;
   } else if (+event.targetTouches[0].clientX > 0 && +event.targetTouches[0].clientX < 200) {
     inputController.left = true;
-    inputController.right = false;
   } else if (+event.targetTouches[0].clientX > 200 && +event.targetTouches[0].clientX < 400) {
-    inputController.left = false;
     inputController.right = true;
-    inputController.attack = true;
   }
 };
 
@@ -846,6 +896,7 @@ var handleEnd = function handleEnd(event) {
   inputController.up = false;
   inputController.right = false;
   inputController.left = false;
+  inputController.attack = false;
 };
 
 canvas.addEventListener("touchstart", handleStart, false);
@@ -921,7 +972,10 @@ function loop() {
   player.update(inputController);
   displayController.drawSprite(playerImg, viewPort, player);
   viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
-  displayController.draw('rectangle', viewPort, player.damageZone);
+
+  if (player.isAttacking) {
+    displayController.draw('rectangle', viewPort, player.damageZone);
+  }
 
   for (var i = 0; i < mapArray.length; i++) {
     indexRaw = Math.floor(i / columNb);
@@ -959,17 +1013,17 @@ function loop() {
         viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
       }
     }
-  } // if (inputController.isAttacking){
-  //     displayController.draw('rectangle', player.damageZone);
-  // }
-  // enemiesList.forEach((enemy, index) => {
-  //     displayController.drawSprite(enemyImg, viewPort, enemy);
-  //     // if(player.damageZone && gameService.checkCollision(player.damageZone, enemy)){
-  //     //     alert('collision entre ennemi et damagezone');
-  //     //     enemiesList.splice(index, 1); 
-  //     // }
-  // });
-  //On itère sur la liste des briques
+  }
+
+  enemiesList.forEach(function (enemy, index) {
+    enemy.update();
+    displayController.drawSprite(enemyImg, viewPort, enemy);
+
+    if (player.isAttacking && exports.gameService.checkCollision(player.damageZone, enemy)) {
+      alert('collision entre ennemi et damagezone');
+      enemiesList.splice(index, 1);
+    }
+  }); //On itère sur la liste des briques
   // brickList.forEach(brick=> {
   //     displayController.draw('rectangle', brick, player);
   //     // if (gameService.checkCollision(brick, player)){ // Si collision entre la brique et le player
@@ -981,7 +1035,6 @@ function loop() {
   //         player.setJump(false);
   //     };
   // });
-
 
   window.requestAnimationFrame(loop);
 } // fetch('/levels.json').then(data=> {
@@ -1044,7 +1097,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50708" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49343" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

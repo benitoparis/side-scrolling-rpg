@@ -57,7 +57,7 @@ const initEnemies = (count: number)=>{
         const x = gameService.rangeNumber(400, 1500);
         const y = 640;
 
-        enemiesList = [...enemiesList, new Enemy(x, y)];
+        enemiesList = [...enemiesList, new Enemy(x, y, gameService)];
     } 
 }
 
@@ -102,14 +102,11 @@ let handleStart = (event) =>{
     if(+event.targetTouches[0].clientX  > 400 && +event.targetTouches[0].clientY < 300){
         inputController.up = true;
     } else if(+event.targetTouches[0].clientX > 400 && +event.targetTouches[0].clientY > 300) {
-        inputController.isAttacking = true;
+        inputController.attack = true;
     } else if (+event.targetTouches[0].clientX > 0 && +event.targetTouches[0].clientX < 200){
         inputController.left = true;
-        inputController.right = false;
     } else if(+event.targetTouches[0].clientX > 200 && +event.targetTouches[0].clientX < 400) {
-        inputController.left = false;
         inputController.right = true;
-        inputController.attack = true;
     }
     
 
@@ -120,6 +117,7 @@ let handleEnd = (event) => {
     inputController.up = false;
     inputController.right = false;
     inputController.left = false;
+    inputController.attack = false;
     
 }
 
@@ -203,7 +201,10 @@ function loop() {
     displayController.drawSprite(playerImg, viewPort, player);
     viewPort.defineViewPoint(player.x - ((800 / 2) - player.width / 2), (player.y - (600/2) + 20), 800, 600);
 
-    displayController.draw('rectangle',viewPort,player.damageZone);
+    if (player.isAttacking){
+        displayController.draw('rectangle',viewPort,player.damageZone);
+    }
+
 
     for (let i = 0; i < mapArray.length; i++){
         
@@ -253,19 +254,17 @@ function loop() {
 
     }
     
-
-    // if (inputController.isAttacking){
-    //     displayController.draw('rectangle', player.damageZone);
-    // }
     
-    // enemiesList.forEach((enemy, index) => {
-    //     displayController.drawSprite(enemyImg, viewPort, enemy);
+    enemiesList.forEach((enemy, index) => {
+        enemy.update();
+        displayController.drawSprite(enemyImg, viewPort, enemy);
 
-    //     // if(player.damageZone && gameService.checkCollision(player.damageZone, enemy)){
-    //     //     alert('collision entre ennemi et damagezone');
-    //     //     enemiesList.splice(index, 1); 
-    //     // }
-    // });
+
+        if (player.isAttacking && gameService.checkCollision(player.damageZone, enemy)){
+            alert('collision entre ennemi et damagezone');
+            enemiesList.splice(index, 1); 
+        }
+    });
     
 
   
