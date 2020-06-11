@@ -17,7 +17,7 @@ export class Block {
     img: Object;
     //mapIndexPosition = Math.floor(this.centerX / 48) + (60 * Math.floor(this.centerY / 48));
     speedX = 2;
-    speedY = 2;
+    speedY = 0;
     faceX = 0;
     faceY = 64;
     haveTouchedPlayer: false;
@@ -42,8 +42,9 @@ export class Block {
 
     if (this.x < player.x && this.x + this.width > this.x) { // Si le joueur est en dessous du block
         // Le block tombe
-        this.y = this.y + this.speedX;
+        this.speedY = 2;
     }
+    this.y = this.y + this.speedY;
 
     //this.updateFaceCrop()
 

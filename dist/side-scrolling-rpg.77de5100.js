@@ -578,7 +578,7 @@ function () {
     this.height = 64; //mapIndexPosition = Math.floor(this.centerX / 48) + (60 * Math.floor(this.centerY / 48));
 
     this.speedX = 2;
-    this.speedY = 2;
+    this.speedY = 0;
     this.faceX = 0;
     this.faceY = 64; //this.name = name;
     //this.reference = reference;
@@ -599,10 +599,11 @@ function () {
     if (this.x < player.x && this.x + this.width > this.x) {
       // Si le joueur est en dessous du block
       // Le block tombe
-      this.y = this.y + this.speedX;
-    } //this.updateFaceCrop()
-    //this.setCenter();
+      this.speedY = 2;
+    }
 
+    this.y = this.y + this.speedY; //this.updateFaceCrop()
+    //this.setCenter();
   }; // Réinitialise les cordonnées x /y du people
 
 
@@ -945,7 +946,7 @@ var initBlocks = function initBlocks(count) {
   // 0n crée plusieurs ennemis
   for (var i = 0; i < count; i++) {
     var x = exports.gameService.rangeNumber(400, 1500);
-    var y = exports.gameService.rangeNumber(2, 300);
+    var y = exports.gameService.rangeNumber(2, 100);
     console.log({
       x: x,
       y: y
@@ -983,9 +984,12 @@ var initPlateforms = function initPlateforms(count) {
   }
 };
 
-initEnemies(5);
-initPlateforms(6);
-initBlocks(5);
+var initAll = function initAll() {
+  initEnemies(5);
+  initPlateforms(6);
+  initBlocks(5);
+};
+
 console.log('blockList', blockList);
 
 var handleStart = function handleStart(event) {
@@ -1011,7 +1015,9 @@ canvas.addEventListener("touchstart", handleStart, false);
 canvas.addEventListener("touchend", handleEnd, false); // canvas.addEventListener("touchcancel", handleCancel, false);
 // canvas.addEventListener("touchleave", handleLeave, false);
 // canvas.addEventListener("touchmove", handleMove, false);
-// L'animation générale
+// On crée tous les sprites et les éléments
+
+initAll(); // L'animation générale
 
 function loop() {
   displayController.clear(); //displayController.drawBackground(backGroundImg, player);
@@ -1094,6 +1100,7 @@ function loop() {
   viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
 
   if (player.isAttacking) {
+    // Si le player attaque on affiche sa zone d'attaque représentée par un carré
     displayController.draw('rectangle', viewPort, player.damageZone);
   }
 
@@ -1178,6 +1185,7 @@ function loop() {
 //     loop();
 // };
 //console.log(tileSetImg)
+// On ajoute les évènement pour resizer le canvas
 
 
 window.addEventListener('resize', displayController.resizeCanvas, false);
@@ -1211,7 +1219,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49203" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62663" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

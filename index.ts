@@ -65,7 +65,7 @@ const initBlocks = (count: number)=> {
     // 0n crée plusieurs ennemis
     for (let i = 0; i < count; i++) {
         const x = gameService.rangeNumber(400, 1500);
-        const y = gameService.rangeNumber(2, 300);
+        const y = gameService.rangeNumber(2, 100);
 
         console.log({x, y});
 
@@ -104,9 +104,13 @@ const initPlateforms = (count: number)=> {
 }
 
 
-initEnemies(5);
-initPlateforms(6);
-initBlocks(5);
+
+
+const initAll = ()=> {
+    initEnemies(5);
+    initPlateforms(6);
+    initBlocks(5);
+};
 
 console.log('blockList', blockList);
 
@@ -142,6 +146,8 @@ canvas.addEventListener("touchend", handleEnd, false);
 // canvas.addEventListener("touchmove", handleMove, false);
 
 
+// On crée tous les sprites et les éléments
+initAll();
 
 
 // L'animation générale
@@ -226,7 +232,7 @@ function loop() {
     displayController.drawSprite(playerImg, viewPort, player);
     viewPort.defineViewPoint(player.x - ((800 / 2) - player.width / 2), (player.y - (600/2) + 20), 800, 600);
 
-    if (player.isAttacking){
+    if (player.isAttacking){ // Si le player attaque on affiche sa zone d'attaque représentée par un carré
         displayController.draw('rectangle',viewPort,player.damageZone);
     }
 
@@ -342,9 +348,12 @@ function loop() {
 
 
 
-
-
+// On ajoute les évènement pour resizer le canvas
 window.addEventListener('resize', displayController.resizeCanvas, false);
 window.addEventListener('orientationchange', displayController.resizeCanvas, false);
 
+
 loop();
+
+
+
