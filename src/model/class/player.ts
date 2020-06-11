@@ -1,6 +1,7 @@
 import { InputController } from './input-controller';
 import { sprite } from '../interface/general-interfaces';
 import { DamageZone } from './damage-zone';
+import { level } from '../../../index';
 
 export class Player {
 
@@ -80,7 +81,7 @@ export class Player {
 
         if (this.x < 300) { // On empeche le joueur d'aller au bord gauche de la map courante
             this.x = this.x + 10;
-        } else if (this.x > 4000){ // On empeche le joueur d'aller au bord droit de la map courante
+        } else if (this.x > level.length - 500 ){ // On empeche le joueur d'aller au bord droit de la map courante
             this.x = this.x - 10; 
         }
 
