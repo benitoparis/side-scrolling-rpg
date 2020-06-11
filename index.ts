@@ -6,6 +6,7 @@ import { GameService } from './src/model/class/game-service';
 import { Enemy } from './src/model/class/enemy';
 import { ViewPort } from './src/model/class/viewport';
 import { sprite } from './src/model/interface/general-interfaces';
+import { Block } from './src/model/class/block';
 
 
 const canvas: any =  document.getElementById('game');
@@ -15,9 +16,10 @@ const player = new Player(400, 600);
 const inputController =  new InputController();
 const viewPort = new ViewPort(0, 0, 800, 600);
 export const gameService = new GameService();
+
+let brickList = [];
 let enemiesList =  [];
-
-
+let blockList = [];
 
 let mapArray = [
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -45,10 +47,6 @@ let tileSetImg = document.getElementById('tileset');
 let playerImg = document.getElementById('heros6');
 let enemyImg = document.getElementById('personnage-important2');
 
-
-
-let collideBrick: sprite;
-
 // Méthode pour créer des ennemis
 const initEnemies = (count: number)=>{
 
@@ -58,11 +56,26 @@ const initEnemies = (count: number)=>{
         const y = 640;
 
         enemiesList = [...enemiesList, new Enemy(x, y, gameService)];
+    }
+}
+
+// Méthode pour créer des ennemis
+const initBlocks = (count: number)=> {
+
+    // 0n crée plusieurs ennemis
+    for (let i = 0; i < count; i++) {
+        const x = gameService.rangeNumber(400, 1500);
+        const y = gameService.rangeNumber(2, 300);
+
+        console.log({x, y});
+
+        blockList = [...blockList, new Block(x, y, gameService)];
     } 
 }
 
 
-let brickList = [];
+
+
 
 
 const initPlateforms = (count: number)=> {
@@ -86,15 +99,16 @@ const initPlateforms = (count: number)=> {
                 // On l'ajoute à la liste des briques
                 brickList = [...brickList, newBrick];
             }
-        })
-        
-        
+        });  
     }
 }
 
 
 initEnemies(5);
 initPlateforms(6);
+initBlocks(5);
+
+console.log('blockList', blockList);
 
 
 let handleStart = (event) =>{
@@ -196,6 +210,17 @@ function loop() {
 
     }
 
+    // On affiche les blocks
+    blockList.forEach(block => {
+        block.update(player);
+        displayController.drawSprite(tileSetImg, viewPort, block);
+
+        if (!block.haveTouchedPlayer && gameService.checkCollision(player, block)){ // Si le block n'a pas encore percuté le joueur et qu'il y a collision
+            block.haveTouchedPlayer = true;
+            // On retire un point de crédit au joueur.
+            player.setLifeCredit = player.getLifeCredit - 1;
+        }
+    });
 
     player.update(inputController);
     displayController.drawSprite(playerImg, viewPort, player);
@@ -232,8 +257,11 @@ function loop() {
                 
                 player.groundY = tileY;
                 player.update(inputController);
-                const txt = `player.x : ${player.x}, player.y : ${player.y }, tileX : ${tileX}, tileY : ${tileY}`;
-                displayController.drawTxt(txt);
+                const txt = `player.x : ${player.x}, player.y : ${player.y }`;
+                displayController.drawTxt(txt, 10, 50);
+
+                const txt2 = `tileX : ${tileX}, tileY : ${tileY}`;
+                displayController.drawTxt(txt2, 10, 100);
 
                 viewPort.defineViewPoint(player.x - ((800 / 2) - player.width / 2), (player.y - (600/2) + 20), 800, 600);
 
@@ -242,8 +270,14 @@ function loop() {
                 
                 player.groundY = 704;
                 player.update(inputController);
-                const txt= `player.x : ${player.x}, player.y : ${player.y}`;
-                displayController.drawTxt(txt);
+                const texteCoordonneesX= `player.x : ${player.x}`;
+                displayController.drawTxt(texteCoordonneesX, 10, 120);
+               
+                const texteCoordonneesY= `player.y : ${player.y}`;
+                displayController.drawTxt(texteCoordonneesY, 10, 150);
+
+                const texteCreditsDispo= `Credits : ${player.getLifeCredit}`;
+                displayController.drawTxt(texteCreditsDispo, 10, 180);
 
                 viewPort.defineViewPoint(player.x - ((800 / 2) - player.width / 2), (player.y - (600/2) + 20), 800, 600);
 
@@ -265,24 +299,9 @@ function loop() {
             enemiesList.splice(index, 1); 
         }
     });
+
+ 
     
-
-  
-    
-    //On itère sur la liste des briques
-    // brickList.forEach(brick=> {
-    //     displayController.draw('rectangle', brick, player);
-    //     // if (gameService.checkCollision(brick, player)){ // Si collision entre la brique et le player
-    //     // };
-    //     if(gameService.handleCollision(player, brick)){
-
-    //         //player.x = savedPlayerX;
-    //         //collideBrick = brick;
-    //         player.y = brick.y - player.height - 25;
-    //         player.setJump(false);
-    //     };
-    // });
-
     window.requestAnimationFrame(loop); 
 }
 

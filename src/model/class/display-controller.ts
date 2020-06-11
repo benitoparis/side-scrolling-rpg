@@ -2,6 +2,7 @@ import { sprite } from '../interface/general-interfaces';
 import { Player } from './player';
 import { Enemy } from './enemy';
 import { ViewPort } from './viewport';
+import { Block } from './block';
 
 
 export class DisplayController {
@@ -25,8 +26,6 @@ export class DisplayController {
     draw(shape: string, viewPort: ViewPort, sprite: sprite): void {
 
         const {x, y, width, height, color } = sprite;
-
-        console.log('draw');
         this.ctx.fillStyle = color;
 
         switch(shape){
@@ -56,7 +55,7 @@ export class DisplayController {
             canvasX = (this.canvas.width / 2) - sprite.width / 2;
             canvasY = (this.canvas.height - 256 - sprite.height);
         }
-        if (sprite instanceof Enemy){
+        if (sprite instanceof Enemy || sprite instanceof Block){
             canvasX = sprite.x - viewPort.x;
             canvasY = sprite.y - viewPort.y;
         }
@@ -113,14 +112,12 @@ export class DisplayController {
     }
 
     resizeCanvas(event): void {
-
-        console.log('event', event);
         this.canvas.width = 800 //window.innerWidth;
         this.canvas.height = 600 // window.innerHeight;
     }
    
-    drawTxt(txt: string){
+    drawTxt(txt: string, canvasX:number, canvasY:number): void {
         this.ctx.font = "20px Arial";
-        this.ctx.fillText(txt, 10, 50);
+        this.ctx.fillText(txt, canvasX, canvasY);
     }
 }

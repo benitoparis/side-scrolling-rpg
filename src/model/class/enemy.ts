@@ -103,8 +103,6 @@ export class Enemy {
     this.updateFaceCrop()
 
     this.setCenter();
-
-    console.log('this.x', this.x);
   }
 
   // Réinitialise les cordonnées x /y du people
@@ -115,9 +113,7 @@ export class Enemy {
 
   // Renvoie une direction aléatoirement
   setRandomDirection(): void {
-    
     this.currentDirection = this.gameService.randomDirection();
-    console.log('setRandomDirection this.currentDirection',this.currentDirection);
   }
 
   // On recalcule le centre du people

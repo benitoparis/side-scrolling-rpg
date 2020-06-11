@@ -216,6 +216,7 @@ function () {
       faceX: 64,
       faceY: 0
     }];
+    this.lifeCredit = 10;
     this.x = x;
     this.y = y;
     this.centerX = this.x + this.width / 2;
@@ -281,8 +282,23 @@ function () {
 
   Player.prototype.setJump = function (status) {
     this.jump = status;
-  }; // Méthode appelée quand le bouton d'action est touchée
+  };
 
+  Object.defineProperty(Player.prototype, "getLifeCredit", {
+    get: function get() {
+      return this.lifeCredit;
+    },
+    enumerable: true,
+    configurable: true
+  });
+  ;
+  Object.defineProperty(Player.prototype, "setLifeCredit", {
+    set: function set(value) {
+      this.lifeCredit = value;
+    },
+    enumerable: true,
+    configurable: true
+  }); // Méthode appelée quand le bouton d'action est touchée
 
   Player.prototype.attack = function (status) {
     this.isAttacking = status;
@@ -477,7 +493,6 @@ function () {
 
     this.updateFaceCrop();
     this.setCenter();
-    console.log('this.x', this.x);
   }; // Réinitialise les cordonnées x /y du people
 
 
@@ -489,7 +504,6 @@ function () {
 
   Enemy.prototype.setRandomDirection = function () {
     this.currentDirection = this.gameService.randomDirection();
-    console.log('setRandomDirection this.currentDirection', this.currentDirection);
   }; // On recalcule le centre du people
 
 
@@ -548,6 +562,83 @@ function () {
 }();
 
 exports.Enemy = Enemy;
+},{}],"src/model/class/block.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Block =
+/** @class */
+function () {
+  // Constructeur de la classe des ennemies
+  function Block(x, y, gameService) {
+    this.width = 64;
+    this.height = 64; //mapIndexPosition = Math.floor(this.centerX / 48) + (60 * Math.floor(this.centerY / 48));
+
+    this.speedX = 2;
+    this.speedY = 2;
+    this.faceX = 0;
+    this.faceY = 64; //this.name = name;
+    //this.reference = reference;
+    //this.characterImg = config.getImage(this.reference);
+
+    /* propriétés communes sprites animés */
+
+    this.x = x; // Position X sur la map
+
+    this.y = y; // Position Y sur la map
+
+    this.centerX = this.x + this.width / 2;
+    this.centerY = this.y + this.height / 2;
+  } // Méthode qui va modifier les coordonnées du people.
+
+
+  Block.prototype.update = function (player) {
+    if (this.x < player.x && this.x + this.width > this.x) {
+      // Si le joueur est en dessous du block
+      // Le block tombe
+      this.y = this.y + this.speedX;
+    } //this.updateFaceCrop()
+    //this.setCenter();
+
+  }; // Réinitialise les cordonnées x /y du people
+
+
+  Block.prototype.resetCoordinates = function (x, y) {
+    this.x = x;
+    this.y = y;
+  }; // Renvoie une direction aléatoirement
+
+
+  Block.prototype.setRandomDirection = function () {//this.currentDirection = this.gameService.randomDirection();
+    //console.log('setRandomDirection this.currentDirection',this.currentDirection);
+  }; // On recalcule le centre du people
+
+
+  Block.prototype.setCenter = function () {
+    // On recalcule le centre du people
+    this.centerX = this.x + this.width - this.width / 2;
+    this.centerY = this.y + this.height - this.height / 2;
+  }; // Méthode pour réinitialiser la position du people dans la map
+
+
+  Block.prototype.setPosition = function (destination) {
+    this.x = destination.x;
+    this.y = destination.y; //this.currentWorldPosition =  new WorldPosition(destination.worldId,destination.mapSheetId );
+
+    this.setCenter(); //this.setMapIndexPosition();
+  }; // Méthode pour setter l'index du figuant sur la map
+
+
+  Block.prototype.setMapIndexPosition = function () {//this.mapIndexPosition = Math.floor(this.centerX / 48) + (60 * Math.floor(this.centerY / 48));
+  };
+
+  return Block;
+}();
+
+exports.Block = Block;
 },{}],"src/model/class/display-controller.ts":[function(require,module,exports) {
 "use strict";
 
@@ -558,6 +649,8 @@ Object.defineProperty(exports, "__esModule", {
 var player_1 = require("./player");
 
 var enemy_1 = require("./enemy");
+
+var block_1 = require("./block");
 
 var DisplayController =
 /** @class */
@@ -579,7 +672,6 @@ function () {
         width = sprite.width,
         height = sprite.height,
         color = sprite.color;
-    console.log('draw');
     this.ctx.fillStyle = color;
 
     switch (shape) {
@@ -605,7 +697,7 @@ function () {
       canvasY = this.canvas.height - 256 - sprite.height;
     }
 
-    if (sprite instanceof enemy_1.Enemy) {
+    if (sprite instanceof enemy_1.Enemy || sprite instanceof block_1.Block) {
       canvasX = sprite.x - viewPort.x;
       canvasY = sprite.y - viewPort.y;
     }
@@ -660,22 +752,21 @@ function () {
   };
 
   DisplayController.prototype.resizeCanvas = function (event) {
-    console.log('event', event);
     this.canvas.width = 800; //window.innerWidth;
 
     this.canvas.height = 600; // window.innerHeight;
   };
 
-  DisplayController.prototype.drawTxt = function (txt) {
+  DisplayController.prototype.drawTxt = function (txt, canvasX, canvasY) {
     this.ctx.font = "20px Arial";
-    this.ctx.fillText(txt, 10, 50);
+    this.ctx.fillText(txt, canvasX, canvasY);
   };
 
   return DisplayController;
 }();
 
 exports.DisplayController = DisplayController;
-},{"./player":"src/model/class/player.ts","./enemy":"src/model/class/enemy.ts"}],"src/model/class/input-controller.ts":[function(require,module,exports) {
+},{"./player":"src/model/class/player.ts","./enemy":"src/model/class/enemy.ts","./block":"src/model/class/block.ts"}],"src/model/class/input-controller.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -824,18 +915,21 @@ var enemy_1 = require("./src/model/class/enemy");
 
 var viewport_1 = require("./src/model/class/viewport");
 
+var block_1 = require("./src/model/class/block");
+
 var canvas = document.getElementById('game');
 var displayController = new display_controller_1.DisplayController(canvas);
 var player = new player_1.Player(400, 600);
 var inputController = new input_controller_1.InputController();
 var viewPort = new viewport_1.ViewPort(0, 0, 800, 600);
 exports.gameService = new game_service_1.GameService();
+var brickList = [];
 var enemiesList = [];
+var blockList = [];
 var mapArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 4, 5, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
 var tileSetImg = document.getElementById('tileset');
 var playerImg = document.getElementById('heros6');
-var enemyImg = document.getElementById('personnage-important2');
-var collideBrick; // Méthode pour créer des ennemis
+var enemyImg = document.getElementById('personnage-important2'); // Méthode pour créer des ennemis
 
 var initEnemies = function initEnemies(count) {
   // 0n crée plusieurs ennemis
@@ -844,9 +938,21 @@ var initEnemies = function initEnemies(count) {
     var y = 640;
     enemiesList = __spreadArrays(enemiesList, [new enemy_1.Enemy(x, y, exports.gameService)]);
   }
-};
+}; // Méthode pour créer des ennemis
 
-var brickList = [];
+
+var initBlocks = function initBlocks(count) {
+  // 0n crée plusieurs ennemis
+  for (var i = 0; i < count; i++) {
+    var x = exports.gameService.rangeNumber(400, 1500);
+    var y = exports.gameService.rangeNumber(2, 300);
+    console.log({
+      x: x,
+      y: y
+    });
+    blockList = __spreadArrays(blockList, [new block_1.Block(x, y, exports.gameService)]);
+  }
+};
 
 var initPlateforms = function initPlateforms(count) {
   var _loop_1 = function _loop_1(i) {
@@ -879,6 +985,8 @@ var initPlateforms = function initPlateforms(count) {
 
 initEnemies(5);
 initPlateforms(6);
+initBlocks(5);
+console.log('blockList', blockList);
 
 var handleStart = function handleStart(event) {
   if (+event.targetTouches[0].clientX > 400 && +event.targetTouches[0].clientY < 300) {
@@ -967,8 +1075,20 @@ function loop() {
         displayController.drawImg(tileSetImg, cropX, cropY, canvasX, canvasY);
       }
     }
-  }
+  } // On affiche les blocks
 
+
+  blockList.forEach(function (block) {
+    block.update(player);
+    displayController.drawSprite(tileSetImg, viewPort, block);
+
+    if (!block.haveTouchedPlayer && exports.gameService.checkCollision(player, block)) {
+      // Si le block n'a pas encore percuté le joueur et qu'il y a collision
+      block.haveTouchedPlayer = true; // On retire un point de crédit au joueur.
+
+      player.setLifeCredit = player.getLifeCredit - 1;
+    }
+  });
   player.update(inputController);
   displayController.drawSprite(playerImg, viewPort, player);
   viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
@@ -1002,14 +1122,20 @@ function loop() {
         player.setJump(false);
         player.groundY = tileY;
         player.update(inputController);
-        var txt = "player.x : " + player.x + ", player.y : " + player.y + ", tileX : " + tileX + ", tileY : " + tileY;
-        displayController.drawTxt(txt);
+        var txt = "player.x : " + player.x + ", player.y : " + player.y;
+        displayController.drawTxt(txt, 10, 50);
+        var txt2 = "tileX : " + tileX + ", tileY : " + tileY;
+        displayController.drawTxt(txt2, 10, 100);
         viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
       } else {
         player.groundY = 704;
         player.update(inputController);
-        var txt = "player.x : " + player.x + ", player.y : " + player.y;
-        displayController.drawTxt(txt);
+        var texteCoordonneesX = "player.x : " + player.x;
+        displayController.drawTxt(texteCoordonneesX, 10, 120);
+        var texteCoordonneesY = "player.y : " + player.y;
+        displayController.drawTxt(texteCoordonneesY, 10, 150);
+        var texteCreditsDispo = "Credits : " + player.getLifeCredit;
+        displayController.drawTxt(texteCreditsDispo, 10, 180);
         viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
       }
     }
@@ -1023,19 +1149,7 @@ function loop() {
       alert('collision entre ennemi et damagezone');
       enemiesList.splice(index, 1);
     }
-  }); //On itère sur la liste des briques
-  // brickList.forEach(brick=> {
-  //     displayController.draw('rectangle', brick, player);
-  //     // if (gameService.checkCollision(brick, player)){ // Si collision entre la brique et le player
-  //     // };
-  //     if(gameService.handleCollision(player, brick)){
-  //         //player.x = savedPlayerX;
-  //         //collideBrick = brick;
-  //         player.y = brick.y - player.height - 25;
-  //         player.setJump(false);
-  //     };
-  // });
-
+  });
   window.requestAnimationFrame(loop);
 } // fetch('/levels.json').then(data=> {
 //      return data.json();
@@ -1069,7 +1183,7 @@ function loop() {
 window.addEventListener('resize', displayController.resizeCanvas, false);
 window.addEventListener('orientationchange', displayController.resizeCanvas, false);
 loop();
-},{"./src/model/class/display-controller":"src/model/class/display-controller.ts","./src/model/class/input-controller":"src/model/class/input-controller.ts","./src/model/class/player":"src/model/class/player.ts","./src/model/class/game-service":"src/model/class/game-service.ts","./src/model/class/enemy":"src/model/class/enemy.ts","./src/model/class/viewport":"src/model/class/viewport.ts"}],"../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./src/model/class/display-controller":"src/model/class/display-controller.ts","./src/model/class/input-controller":"src/model/class/input-controller.ts","./src/model/class/player":"src/model/class/player.ts","./src/model/class/game-service":"src/model/class/game-service.ts","./src/model/class/enemy":"src/model/class/enemy.ts","./src/model/class/viewport":"src/model/class/viewport.ts","./src/model/class/block":"src/model/class/block.ts"}],"../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -1097,7 +1211,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49343" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49203" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

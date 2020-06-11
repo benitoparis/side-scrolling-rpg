@@ -20,6 +20,7 @@ export class Block {
     speedY = 2;
     faceX = 0;
     faceY = 64;
+    haveTouchedPlayer: false;
 
  // Constructeur de la classe des ennemies
  constructor(x: number, y:number, gameService: GameService) {

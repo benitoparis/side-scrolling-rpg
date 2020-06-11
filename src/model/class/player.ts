@@ -28,7 +28,8 @@ export class Player {
     leftCycleLoop = [{faceX:0,faceY:32}, {faceX:32,faceY:32},{faceX:0,faceY:32},{faceX:64,faceY:32}];
     upCycleLoop = [{faceX:0,faceY:96}, {faceX:32,faceY:96},{faceX:0,faceY:96},{faceX:64,faceY:96}];
     downCycleLoop = [{faceX:0,faceY:0}, {faceX:32,faceY:0},{faceX:0,faceY:0},{faceX:64,faceY:0}];
-    
+    lifeCredit =  10;
+
     constructor(
         x: number,
         y: number,
@@ -98,6 +99,9 @@ export class Player {
     setJump(status : boolean): void {
         this.jump = status;
     }
+
+    get getLifeCredit():number { return this.lifeCredit;};
+    set setLifeCredit(value: number) { this.lifeCredit = value;}
 
     // Méthode appelée quand le bouton d'action est touchée
     attack(status : boolean): void {
