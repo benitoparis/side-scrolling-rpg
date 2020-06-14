@@ -38,4 +38,16 @@ export class Map {
         return this.height;
     }
 
+    get getLength(): number {
+        return this.length;
+    }
+
+    get getTileSize(): number {
+        return this.tileSize;
+    }
+
+    get getNbCol(): number {
+        return this.nbCol;
+    }
+
 }

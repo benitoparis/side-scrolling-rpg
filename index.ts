@@ -19,12 +19,11 @@ const inputController =  new InputController();
 const viewPort = new ViewPort(0, 0, 800, 600);
 export const gameService = new GameService();
 
-let brickList = [];
 let enemiesList =  [];
 let blockList = [];
 
 let  mapData = {
-        nbCol: 40,
+        nbCol: 80,
         tileSize: 64,
         collection: [
             0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -48,28 +47,6 @@ let  mapData = {
             2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
         ]
 };
-
-const mapArray = [
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,4,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,4,5,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1,1,1,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-    4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-    4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-    4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-    4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-    4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-    4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-    4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-]
 
 
 const imgTileSetData = {
@@ -159,29 +136,26 @@ function loop() {
 
     displayController.clear();
 
-    //displayController.drawBackground(backGroundImg, player);
-
     const columNb = 80;
     let indexRaw = 0;
-    const tileSize = 64;
     let canvasX = 0;
     let canvasY = 0;
     let tileX = 0;
     let tileY = 0;
 
-    let xMin = Math.floor(viewPort.x / tileSize ); // Colone minimale à dessiner
-    let yMin = Math.floor(viewPort.y / tileSize ); // Rangée Minimum à dessiner
-    let xMax = Math.ceil((viewPort.x + viewPort.width) / tileSize); // Colonne maximale à dessiner
-    let yMax = Math.ceil((viewPort.y + viewPort.height) / tileSize); // Rangée Minimale à dessiner
+    let xMin = Math.floor(viewPort.x / map.getTileSize ); // Colone minimale à dessiner
+    let yMin = Math.floor(viewPort.y / map.getTileSize ); // Rangée Minimum à dessiner
+    let xMax = Math.ceil((viewPort.x + viewPort.width) / map.getTileSize); // Colonne maximale à dessiner
+    let yMax = Math.ceil((viewPort.y + viewPort.height) / map.getTileSize); // Rangée Minimale à dessiner
 
  
     for (let x = xMin; x < xMax; x++){
 
         for (let y = yMin; y < yMax; y++){
 
-            let value = mapArray[y * columNb + x];
-            canvasX = x * tileSize - viewPort.x;
-            canvasY = y * tileSize - viewPort.y;
+            let value = map.getMapCollection[y * map.getNbCol + x];
+            canvasX = x * map.getTileSize - viewPort.x;
+            canvasY = y * map.getTileSize - viewPort.y;
 
         // On récupère les coordonnées de l'index de tuile sur la tileSet
         const {cropX,cropY} = tileSet.getCropCoordinates(value);
@@ -215,26 +189,14 @@ function loop() {
     }
 
 
-    for (let i = 0; i < mapArray.length; i++){
+    for (let i = 0; i < map.getLength; i++){
         
-        indexRaw = Math.floor(i /  columNb);
-        tileX = (i - indexRaw * columNb) * tileSize;
-        tileY = indexRaw * tileSize;
-
-        // switch(mapArray[i]){
-        //     case 0:
-        //         cropX = 320;
-        //         cropY = 320;
-        //         break;
-        //     case 1:
-        //         cropX = 64;
-        //         cropY = 0;
-        //         break;
-        // }
+        indexRaw = Math.floor(i /  map.getNbCol);
+        tileX = (i - indexRaw * map.getNbCol) * map.getTileSize;
+        tileY = indexRaw * map.getTileSize;
 
         
-
-        if(mapArray[i] === 3){
+        if(map.getMapCollection[i] === 3){
             if(gameService.handleCollision(player, {x: tileX, y: tileY, width: 64, height: 64 , color: '' })){
                
                 player.setJump(false);
@@ -276,7 +238,6 @@ function loop() {
     enemiesList.forEach((enemy, index) => {
         enemy.update();
         displayController.drawSprite(enemyImg, viewPort, enemy);
-
 
         if (player.isAttacking && gameService.checkCollision(player.damageZone, enemy)){
             alert('collision entre ennemi et damagezone');
