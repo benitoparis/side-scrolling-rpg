@@ -1,58 +1,26 @@
-import { gameService } from '../../../index';
 import { sprite } from "../interface/general-interfaces";
-import { GameService } from './game-service';
+import { gameService, GameService } from './game-service';
+import { CharacterSprite } from './character-sprite';
+import { InputController } from "./input-controller";
 
-export class Enemy {
+export class Enemy extends CharacterSprite {
 
-    //name : string;
-    //energy: number;
-    x: number;
-    y: number;
-    width = 64;
-    height = 64;
-    centerX: number;
-    centerY: number;
-    //reference: string;
-    //characterImg: Object;
-    //mapIndexPosition = Math.floor(this.centerX / 48) + (60 * Math.floor(this.centerY / 48));
-    speedX = 2;
-    speedY = 2;
-    color = '#6BE44A';
-    currentDirection: string;
-    faceX = 0;
-    faceY = 64;
-    currentLoopIndex = 0;
-    currentCycleLoop = [];
-    rightCycleLoop = [{faceX:0,faceY:64}, {faceX:32,faceY:64},{faceX:0,faceY:64},{faceX:64,faceY:64}];
-    leftCycleLoop = [{faceX:0,faceY:32}, {faceX:32,faceY:32},{faceX:0,faceY:32},{faceX:64,faceY:32}];
-    upCycleLoop = [{faceX:0,faceY:96}, {faceX:32,faceY:96},{faceX:0,faceY:96},{faceX:64,faceY:96}];
-    downCycleLoop = [{faceX:0,faceY:0}, {faceX:32,faceY:0},{faceX:0,faceY:0},{faceX:64,faceY:0}];
     autoMove: any;
     gameService: GameService;
 
  // Constructeur de la classe des ennemies
- constructor(x: number, y:number, gameService: GameService) {
+ constructor(name: string, x: number, y:number, characterImg: any, gameService: GameService) {
 
-    //this.name = name;
-    //this.reference = reference;
-    //this.characterImg = config.getImage(this.reference);
-    /* propriétés communes sprites animés */
-    this.x = x; // Position X sur la map
-    this.y = y; // Position Y sur la map
-    this.centerX = (this.x + this.width / 2);
-    this.centerY = (this.y + this.height / 2);
+    super(name, x, y, characterImg);
     this.gameService = gameService;
-
     let that  = this;
     this.autoMove = setInterval(() => { that.setRandomDirection();}, 3000);
-    this.currentDirection = 'left';
-
   }
 
 
 
   // Méthode qui va modifier les coordonnées du people.
-  update() {
+  update(inputController: InputController): void {
 
     switch (this.currentDirection) {
       case 'right':
@@ -116,7 +84,7 @@ export class Enemy {
     this.currentDirection = this.gameService.randomDirection();
   }
 
-  // On recalcule le centre du people
+  // On recalcule les coordonnées du centre de l'entité
   setCenter(): void {
 
     // On recalcule le centre du people
@@ -135,11 +103,6 @@ export class Enemy {
     //this.setMapIndexPosition();
   }
 
-  // Méthode pour setter l'index du figuant sur la map
-  setMapIndexPosition(){
-
-    //this.mapIndexPosition = Math.floor(this.centerX / 48) + (60 * Math.floor(this.centerY / 48));
-  }
 
   // Méthode pour définir les coordonnées de la posture à croper
   updateFaceCrop(): void {

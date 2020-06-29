@@ -3,6 +3,7 @@ import { Player } from './player';
 import { Enemy } from './enemy';
 import { ViewPort } from './viewport';
 import { Block } from './block';
+import { Printable, TxtFormat} from '../interface/general-interfaces';
 
 
 export class DisplayController {
@@ -17,10 +18,6 @@ export class DisplayController {
         this.canvas.width = 800 //window.innerWidth;
         this.canvas.height = 600 //window.innerHeight;
         this.ctx = this.canvas.getContext('2d');
-    }
-
-    initCanvas(){
-     
     }
 
     draw(shape: string, viewPort: ViewPort, sprite: sprite): void {
@@ -78,7 +75,7 @@ export class DisplayController {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     };
 
-    drawBackground(backgroundImg: any, player: sprite){
+    drawBackground(backgroundImg: any, player: sprite): void {
 
           this.ctx.drawImage(
             backgroundImg, // Objet image représentant le background
@@ -116,8 +113,24 @@ export class DisplayController {
         this.canvas.height = 600 // window.innerHeight;
     }
    
-    drawTxt(txt: string, canvasX:number, canvasY:number): void {
-        this.ctx.font = "20px Arial";
-        this.ctx.fillText(txt, canvasX, canvasY);
+    drawTxt(list: TxtFormat[]): void {
+
+        list.forEach(elem=> {
+            this.ctx.fillStyle = elem.color;
+            this.ctx.font = elem.font;
+            this.ctx.fillText(elem.txt, elem.canvasX, elem.canvasY);
+        });
+    }
+
+    // Méthode pour dessiner un fond de couleur
+    dawBgColor(color: string): void {
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    // Méthode pour afficher du texte sur fond noir
+    drawStoryScreen(printDatas: Printable): void {
+        this.dawBgColor(printDatas.bgColor);
+        this.drawTxt(printDatas.textList);
     }
 }

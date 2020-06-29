@@ -9,7 +9,6 @@ export class InputController {
 
     constructor(){
     }
-
-
-
 }
+
+export const inputController =  new InputController();

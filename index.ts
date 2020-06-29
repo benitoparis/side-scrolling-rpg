@@ -1,23 +1,18 @@
 /// On importe les classes ici
 import { DisplayController } from './src/model/class/display-controller';
-import { InputController } from './src/model/class/input-controller';
+import { inputController } from './src/model/class/input-controller';
 import { Player } from './src/model/class/player';
-import { GameService } from './src/model/class/game-service';
+import { gameService } from './src/model/class/game-service';
 import { Enemy } from './src/model/class/enemy';
 import { ViewPort } from './src/model/class/viewport';
 import { sprite } from './src/model/interface/general-interfaces';
 import { Block } from './src/model/class/block';
 import { Map } from './src/model/class/map';
 import { TileSet } from './src/model/class/tileSet';
+import { Printable } from './src/model/interface/general-interfaces';
 
 
-const canvas: any =  document.getElementById('game');
 
-const displayController = new DisplayController(canvas);
-const player = new Player(400, 600);
-const inputController =  new InputController();
-const viewPort = new ViewPort(0, 0, 800, 600);
-export const gameService = new GameService();
 
 let enemiesList =  [];
 let blockList = [];
@@ -55,12 +50,30 @@ const imgTileSetData = {
     tileSize: 64
 };
 
+const imgCharacterTileSetData = {
+    nbCol: 3,
+    nbRow: 4,
+    tileSize: 64
+};
+
 
 let tileSetImg = document.getElementById('tileset');
 let playerImg = document.getElementById('heros6');
 let enemyImg = document.getElementById('personnage-important2');
 let tileSet = new TileSet(imgTileSetData);
+
 export let map =  new Map(mapData);
+
+
+const canvas: any =  document.getElementById('game');
+const displayController = new DisplayController(canvas);
+const player = new Player('benoit', 400, 600, playerImg);
+
+//const inputController =  new InputController();
+const viewPort = new ViewPort(0, 0, 800, 600);
+// export const gameService = new GameService();
+
+
 
 // Méthode pour créer des ennemis
 const initEnemies = (count: number) =>{
@@ -70,11 +83,11 @@ const initEnemies = (count: number) =>{
         const x = gameService.rangeNumber(400, 1500);
         const y = 640;
 
-        enemiesList = [...enemiesList, new Enemy(x, y, gameService)];
+        enemiesList = [...enemiesList, new Enemy('valor',x, y,enemyImg, gameService)];
     }
 }
 
-// Méthode pour créer des ennemis
+// Méthode pour créer des blocs
 const initBlocks = (count: number)=> {
 
     // 0n crée plusieurs ennemis
@@ -204,10 +217,10 @@ function loop() {
                 player.groundY = tileY;
                 player.update(inputController);
                 const txt = `player.x : ${player.x}, player.y : ${player.y }`;
-                displayController.drawTxt(txt, 10, 50);
+                //displayController.drawTxt(txt, 10, 50);
 
                 const txt2 = `tileX : ${tileX}, tileY : ${tileY}`;
-                displayController.drawTxt(txt2, 10, 100);
+                //displayController.drawTxt(txt2, 10, 100);
 
                 viewPort.defineViewPoint(player.x - ((800 / 2) - player.width / 2), (player.y - (600/2) + 20), 800, 600);
 
@@ -217,13 +230,13 @@ function loop() {
                 player.groundY = 704;
                 player.update(inputController);
                 const texteCoordonneesX= `player.x : ${player.x}`;
-                displayController.drawTxt(texteCoordonneesX, 10, 120);
+                //displayController.drawTxt(texteCoordonneesX, 10, 120);
                
                 const texteCoordonneesY= `player.y : ${player.y}`;
-                displayController.drawTxt(texteCoordonneesY, 10, 150);
+                //displayController.drawTxt(texteCoordonneesY, 10, 150);
 
                 const texteCreditsDispo= `Credits : ${player.getLifeCredit}`;
-                displayController.drawTxt(texteCreditsDispo, 10, 180);
+                //displayController.drawTxt(texteCreditsDispo, 10, 180);
 
                 viewPort.defineViewPoint(player.x - ((800 / 2) - player.width / 2), (player.y - (600/2) + 20), 800, 600);
 
@@ -285,14 +298,40 @@ function loop() {
 // };
 //console.log(tileSetImg)
 
+const screen1: Printable = {
+    bgColor: '#000000',
+    textList: [
+        {   
+            txt: 'Actraiser',
+            color: '#FFFFFF',
+            font: '100px Comic Sans MS',
+            canvasX: 150,
+            canvasY: 100
+        },
+        {   txt: 'Press Start',
+            color: '#FFFFFF',
+            font: '40px Comic Sans MS',
+            canvasX: 250,
+            canvasY: 300
+        },
+        {   
+            txt: 'copyright....',
+            color: '#FFFFFF',
+            font: '20px Comic Sans MS',
+            canvasX: 250,
+            canvasY: 400
+        },
 
+    ]
+};
+displayController.drawStoryScreen(screen1);
 
 // On ajoute les évènement pour resizer le canvas
-window.addEventListener('resize', displayController.resizeCanvas, false);
-window.addEventListener('orientationchange', displayController.resizeCanvas, false);
+//window.addEventListener('resize', displayController.resizeCanvas, false);
+//window.addEventListener('orientationchange', displayController.resizeCanvas, false);
+window.addEventListener('keypress', loop, true);
 
 
-loop();
 
 
 

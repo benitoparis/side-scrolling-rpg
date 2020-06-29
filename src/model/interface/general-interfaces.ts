@@ -7,3 +7,17 @@ export interface sprite {
     faceX?: number,
     faceY?: number
 }
+
+
+export interface TxtFormat {
+    txt: string;
+    color: string,
+    font: string,
+    canvasX: number,
+    canvasY: number
+}
+
+export interface Printable {
+    bgColor: string,
+    textList: TxtFormat[],
+}

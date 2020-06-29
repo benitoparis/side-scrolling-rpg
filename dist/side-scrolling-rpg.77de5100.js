@@ -139,7 +139,7 @@ function () {
 }();
 
 exports.DamageZone = DamageZone;
-},{}],"src/model/class/player.ts":[function(require,module,exports) {
+},{}],"src/model/class/character-sprite.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -148,24 +148,24 @@ Object.defineProperty(exports, "__esModule", {
 
 var damage_zone_1 = require("./damage-zone");
 
-var index_1 = require("../../../index");
-
-var Player =
+var CharacterSprite =
 /** @class */
 function () {
-  function Player(x, y) {
-    this.faceX = 0;
-    this.faceY = 64;
+  function CharacterSprite(name, x, y, characterImg) {
+    this.lifeCredit = 10;
     this.width = 64;
     this.height = 64;
-    this.jump = false;
+    this.mapIndexPosition = Math.floor(this.centerX / 48) + 60 * Math.floor(this.centerY / 48);
     this.speedX = 0;
     this.speedY = 0;
-    this.color = '#E44C4A';
-    this.currentDirection = 'standing';
+    this.color = '#6BE44A';
+    this.currentDirection = 'right';
+    this.jump = false;
     this.groundY = 704;
     this.currentLoopIndex = 0;
     this.currentCycleLoop = [];
+    this.faceX = 64;
+    this.faceY = 64;
     this.rightCycleLoop = [{
       faceX: 0,
       faceY: 64
@@ -218,11 +218,118 @@ function () {
       faceX: 64,
       faceY: 0
     }];
-    this.lifeCredit = 10;
+    this.name = name;
+    this.x = x;
+    this.y = y;
+    this.characterImg = characterImg;
+    this.updateDamageZone();
+  }
+
+  CharacterSprite.prototype.setPosition = function (x, y) {
     this.x = x;
     this.y = y;
     this.centerX = this.x + this.width / 2;
     this.centerY = this.y + this.height / 2;
+  }; // Méthode appelée quand le bouton de saut est touché
+
+
+  CharacterSprite.prototype.setJump = function (status) {
+    this.jump = status;
+  };
+
+  Object.defineProperty(CharacterSprite.prototype, "getLifeCredit", {
+    get: function get() {
+      return this.lifeCredit;
+    },
+    enumerable: true,
+    configurable: true
+  });
+  ;
+  Object.defineProperty(CharacterSprite.prototype, "setLifeCredit", {
+    set: function set(value) {
+      this.lifeCredit = value;
+    },
+    enumerable: true,
+    configurable: true
+  }); // Méthode appelée quand le bouton d'action est touchée
+
+  CharacterSprite.prototype.attack = function (status) {
+    this.isAttacking = status;
+    this.attackTimeFrame = 0;
+  }; // On met à jour la zone d'attaque devant le sprite
+
+
+  CharacterSprite.prototype.updateDamageZone = function () {
+    var x;
+    var y = this.y - this.height / 2;
+
+    if (this.currentDirection === 'left') {
+      // Si direction vers la gauche
+      x = this.x - this.width / 2;
+    } else if (this.currentDirection === 'right') {
+      // Si direction vers la droite
+      x = this.x + this.width / 2;
+    }
+
+    this.damageZone = new damage_zone_1.DamageZone(x, y, this.width, this.height);
+  };
+
+  CharacterSprite.prototype.setmapIndexPosition = function () {
+    this.mapIndexPosition = Math.floor(this.centerX / this.width) + 80 * Math.floor(this.centerY / this.height);
+  };
+
+  return CharacterSprite;
+}();
+
+exports.CharacterSprite = CharacterSprite;
+},{"./damage-zone":"src/model/class/damage-zone.ts"}],"src/model/class/player.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var index_1 = require("../../../index");
+
+var character_sprite_1 = require("./character-sprite");
+
+var Player =
+/** @class */
+function (_super) {
+  __extends(Player, _super);
+
+  function Player(name, x, y, characterImg) {
+    var _this = this;
+
+    console.log('constructeur player');
+    _this = _super.call(this, name, x, y, characterImg) || this;
+    return _this;
   }
 
   Player.prototype.update = function (input) {
@@ -272,39 +379,6 @@ function () {
 
     this.updateFaceCrop(input);
     this.updateDamageZone();
-  };
-
-  Player.prototype.setPosition = function (x, y) {
-    this.x = x;
-    this.y = y;
-    this.centerX = this.x + this.width / 2;
-    this.centerY = this.y + this.height / 2;
-  }; // Méthode appelée quand le bouton de saut est touché
-
-
-  Player.prototype.setJump = function (status) {
-    this.jump = status;
-  };
-
-  Object.defineProperty(Player.prototype, "getLifeCredit", {
-    get: function get() {
-      return this.lifeCredit;
-    },
-    enumerable: true,
-    configurable: true
-  });
-  ;
-  Object.defineProperty(Player.prototype, "setLifeCredit", {
-    set: function set(value) {
-      this.lifeCredit = value;
-    },
-    enumerable: true,
-    configurable: true
-  }); // Méthode appelée quand le bouton d'action est touchée
-
-  Player.prototype.attack = function (status) {
-    this.isAttacking = status;
-    this.attackTimeFrame = 0;
   }; // Méthode pour définir les coordonnées de la posture à croper
 
 
@@ -338,125 +412,66 @@ function () {
       this.faceX = this.currentCycleLoop[this.currentLoopIndex].faceX;
       this.faceY = this.currentCycleLoop[this.currentLoopIndex].faceY;
     }
-  }; // On met à jour la zone d'attaque devant le joueur
-
-
-  Player.prototype.updateDamageZone = function () {
-    var x;
-    var y = this.y - this.height / 2;
-
-    if (this.currentDirection === 'left') {
-      // Si direction vers la gauche
-      x = this.x - this.width / 2;
-    } else if (this.currentDirection === 'right') {
-      // Si direction vers la droite
-      x = this.x + this.width / 2;
-    }
-
-    this.damageZone = new damage_zone_1.DamageZone(x, y, this.width, this.height);
   };
 
   return Player;
-}();
+}(character_sprite_1.CharacterSprite);
 
 exports.Player = Player;
-},{"./damage-zone":"src/model/class/damage-zone.ts","../../../index":"index.ts"}],"src/model/class/enemy.ts":[function(require,module,exports) {
+},{"../../../index":"index.ts","./character-sprite":"src/model/class/character-sprite.ts"}],"src/model/class/enemy.ts":[function(require,module,exports) {
 "use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var character_sprite_1 = require("./character-sprite");
+
 var Enemy =
 /** @class */
-function () {
-  // Constructeur de la classe des ennemies
-  function Enemy(x, y, gameService) {
-    this.width = 64;
-    this.height = 64; //reference: string;
-    //characterImg: Object;
-    //mapIndexPosition = Math.floor(this.centerX / 48) + (60 * Math.floor(this.centerY / 48));
+function (_super) {
+  __extends(Enemy, _super); // Constructeur de la classe des ennemies
 
-    this.speedX = 2;
-    this.speedY = 2;
-    this.color = '#6BE44A';
-    this.faceX = 0;
-    this.faceY = 64;
-    this.currentLoopIndex = 0;
-    this.currentCycleLoop = [];
-    this.rightCycleLoop = [{
-      faceX: 0,
-      faceY: 64
-    }, {
-      faceX: 32,
-      faceY: 64
-    }, {
-      faceX: 0,
-      faceY: 64
-    }, {
-      faceX: 64,
-      faceY: 64
-    }];
-    this.leftCycleLoop = [{
-      faceX: 0,
-      faceY: 32
-    }, {
-      faceX: 32,
-      faceY: 32
-    }, {
-      faceX: 0,
-      faceY: 32
-    }, {
-      faceX: 64,
-      faceY: 32
-    }];
-    this.upCycleLoop = [{
-      faceX: 0,
-      faceY: 96
-    }, {
-      faceX: 32,
-      faceY: 96
-    }, {
-      faceX: 0,
-      faceY: 96
-    }, {
-      faceX: 64,
-      faceY: 96
-    }];
-    this.downCycleLoop = [{
-      faceX: 0,
-      faceY: 0
-    }, {
-      faceX: 32,
-      faceY: 0
-    }, {
-      faceX: 0,
-      faceY: 0
-    }, {
-      faceX: 64,
-      faceY: 0
-    }]; //this.name = name;
-    //this.reference = reference;
-    //this.characterImg = config.getImage(this.reference);
 
-    /* propriétés communes sprites animés */
+  function Enemy(name, x, y, characterImg, gameService) {
+    var _this = _super.call(this, name, x, y, characterImg) || this;
 
-    this.x = x; // Position X sur la map
-
-    this.y = y; // Position Y sur la map
-
-    this.centerX = this.x + this.width / 2;
-    this.centerY = this.y + this.height / 2;
-    this.gameService = gameService;
-    var that = this;
-    this.autoMove = setInterval(function () {
+    _this.gameService = gameService;
+    var that = _this;
+    _this.autoMove = setInterval(function () {
       that.setRandomDirection();
     }, 3000);
-    this.currentDirection = 'left';
+    return _this;
   } // Méthode qui va modifier les coordonnées du people.
 
 
-  Enemy.prototype.update = function () {
+  Enemy.prototype.update = function (inputController) {
     switch (this.currentDirection) {
       case 'right':
         this.speedX = 2;
@@ -506,7 +521,7 @@ function () {
 
   Enemy.prototype.setRandomDirection = function () {
     this.currentDirection = this.gameService.randomDirection();
-  }; // On recalcule le centre du people
+  }; // On recalcule les coordonnées du centre de l'entité
 
 
   Enemy.prototype.setCenter = function () {
@@ -521,10 +536,6 @@ function () {
     this.y = destination.y; //this.currentWorldPosition =  new WorldPosition(destination.worldId,destination.mapSheetId );
 
     this.setCenter(); //this.setMapIndexPosition();
-  }; // Méthode pour setter l'index du figuant sur la map
-
-
-  Enemy.prototype.setMapIndexPosition = function () {//this.mapIndexPosition = Math.floor(this.centerX / 48) + (60 * Math.floor(this.centerY / 48));
   }; // Méthode pour définir les coordonnées de la posture à croper
 
 
@@ -561,10 +572,10 @@ function () {
   };
 
   return Enemy;
-}();
+}(character_sprite_1.CharacterSprite);
 
 exports.Enemy = Enemy;
-},{}],"src/model/class/block.ts":[function(require,module,exports) {
+},{"./character-sprite":"src/model/class/character-sprite.ts"}],"src/model/class/block.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -667,8 +678,6 @@ function () {
     this.ctx = this.canvas.getContext('2d');
   }
 
-  DisplayController.prototype.initCanvas = function () {};
-
   DisplayController.prototype.draw = function (shape, viewPort, sprite) {
     var x = sprite.x,
         y = sprite.y,
@@ -760,9 +769,27 @@ function () {
     this.canvas.height = 600; // window.innerHeight;
   };
 
-  DisplayController.prototype.drawTxt = function (txt, canvasX, canvasY) {
-    this.ctx.font = "20px Arial";
-    this.ctx.fillText(txt, canvasX, canvasY);
+  DisplayController.prototype.drawTxt = function (list) {
+    var _this = this;
+
+    list.forEach(function (elem) {
+      _this.ctx.fillStyle = elem.color;
+      _this.ctx.font = elem.font;
+
+      _this.ctx.fillText(elem.txt, elem.canvasX, elem.canvasY);
+    });
+  }; // Méthode pour dessiner un fond de couleur
+
+
+  DisplayController.prototype.dawBgColor = function (color) {
+    this.ctx.fillStyle = color;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+  }; // Méthode pour afficher du texte sur fond noir
+
+
+  DisplayController.prototype.drawStoryScreen = function (printDatas) {
+    this.dawBgColor(printDatas.bgColor);
+    this.drawTxt(printDatas.textList);
   };
 
   return DisplayController;
@@ -791,6 +818,7 @@ function () {
 }();
 
 exports.InputController = InputController;
+exports.inputController = new InputController();
 },{}],"src/model/class/game-service.ts":[function(require,module,exports) {
 "use strict";
 
@@ -857,6 +885,7 @@ function () {
 }();
 
 exports.GameService = GameService;
+exports.gameService = new GameService();
 },{}],"src/model/class/viewport.ts":[function(require,module,exports) {
 "use strict";
 
@@ -1057,12 +1086,6 @@ var map_1 = require("./src/model/class/map");
 
 var tileSet_1 = require("./src/model/class/tileSet");
 
-var canvas = document.getElementById('game');
-var displayController = new display_controller_1.DisplayController(canvas);
-var player = new player_1.Player(400, 600);
-var inputController = new input_controller_1.InputController();
-var viewPort = new viewport_1.ViewPort(0, 0, 800, 600);
-exports.gameService = new game_service_1.GameService();
 var enemiesList = [];
 var blockList = [];
 var mapData = {
@@ -1075,32 +1098,43 @@ var imgTileSetData = {
   nbRow: 8,
   tileSize: 64
 };
+var imgCharacterTileSetData = {
+  nbCol: 3,
+  nbRow: 4,
+  tileSize: 64
+};
 var tileSetImg = document.getElementById('tileset');
 var playerImg = document.getElementById('heros6');
 var enemyImg = document.getElementById('personnage-important2');
 var tileSet = new tileSet_1.TileSet(imgTileSetData);
-exports.map = new map_1.Map(mapData); // Méthode pour créer des ennemis
+exports.map = new map_1.Map(mapData);
+var canvas = document.getElementById('game');
+var displayController = new display_controller_1.DisplayController(canvas);
+var player = new player_1.Player('benoit', 400, 600, playerImg); //const inputController =  new InputController();
+
+var viewPort = new viewport_1.ViewPort(0, 0, 800, 600); // export const gameService = new GameService();
+// Méthode pour créer des ennemis
 
 var initEnemies = function initEnemies(count) {
   // 0n crée plusieurs ennemis
   for (var i = 0; i < count; i++) {
-    var x = exports.gameService.rangeNumber(400, 1500);
+    var x = game_service_1.gameService.rangeNumber(400, 1500);
     var y = 640;
-    enemiesList = __spreadArrays(enemiesList, [new enemy_1.Enemy(x, y, exports.gameService)]);
+    enemiesList = __spreadArrays(enemiesList, [new enemy_1.Enemy('valor', x, y, enemyImg, game_service_1.gameService)]);
   }
-}; // Méthode pour créer des ennemis
+}; // Méthode pour créer des blocs
 
 
 var initBlocks = function initBlocks(count) {
   // 0n crée plusieurs ennemis
   for (var i = 0; i < count; i++) {
-    var x = exports.gameService.rangeNumber(400, 1500);
-    var y = exports.gameService.rangeNumber(2, 100);
+    var x = game_service_1.gameService.rangeNumber(400, 1500);
+    var y = game_service_1.gameService.rangeNumber(2, 100);
     console.log({
       x: x,
       y: y
     });
-    blockList = __spreadArrays(blockList, [new block_1.Block(x, y, exports.gameService)]);
+    blockList = __spreadArrays(blockList, [new block_1.Block(x, y, game_service_1.gameService)]);
   }
 };
 
@@ -1113,21 +1147,21 @@ console.log('blockList', blockList);
 
 var handleStart = function handleStart(event) {
   if (+event.targetTouches[0].clientX > 400 && +event.targetTouches[0].clientY < 300) {
-    inputController.up = true;
+    input_controller_1.inputController.up = true;
   } else if (+event.targetTouches[0].clientX > 400 && +event.targetTouches[0].clientY > 300) {
-    inputController.attack = true;
+    input_controller_1.inputController.attack = true;
   } else if (+event.targetTouches[0].clientX > 0 && +event.targetTouches[0].clientX < 200) {
-    inputController.left = true;
+    input_controller_1.inputController.left = true;
   } else if (+event.targetTouches[0].clientX > 200 && +event.targetTouches[0].clientX < 400) {
-    inputController.right = true;
+    input_controller_1.inputController.right = true;
   }
 };
 
 var handleEnd = function handleEnd(event) {
-  inputController.up = false;
-  inputController.right = false;
-  inputController.left = false;
-  inputController.attack = false;
+  input_controller_1.inputController.up = false;
+  input_controller_1.inputController.right = false;
+  input_controller_1.inputController.left = false;
+  input_controller_1.inputController.attack = false;
 };
 
 canvas.addEventListener("touchstart", handleStart, false);
@@ -1175,14 +1209,14 @@ function loop() {
     block.update(player);
     displayController.drawSprite(tileSetImg, viewPort, block);
 
-    if (!block.haveTouchedPlayer && exports.gameService.checkCollision(player, block)) {
+    if (!block.haveTouchedPlayer && game_service_1.gameService.checkCollision(player, block)) {
       // Si le block n'a pas encore percuté le joueur et qu'il y a collision
       block.haveTouchedPlayer = true; // On retire un point de crédit au joueur.
 
       player.setLifeCredit = player.getLifeCredit - 1;
     }
   });
-  player.update(inputController);
+  player.update(input_controller_1.inputController);
   displayController.drawSprite(playerImg, viewPort, player);
   viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
 
@@ -1197,7 +1231,7 @@ function loop() {
     tileY = indexRaw * exports.map.getTileSize;
 
     if (exports.map.getMapCollection[i] === 3) {
-      if (exports.gameService.handleCollision(player, {
+      if (game_service_1.gameService.handleCollision(player, {
         x: tileX,
         y: tileY,
         width: 64,
@@ -1206,21 +1240,21 @@ function loop() {
       })) {
         player.setJump(false);
         player.groundY = tileY;
-        player.update(inputController);
-        var txt = "player.x : " + player.x + ", player.y : " + player.y;
-        displayController.drawTxt(txt, 10, 50);
-        var txt2 = "tileX : " + tileX + ", tileY : " + tileY;
-        displayController.drawTxt(txt2, 10, 100);
+        player.update(input_controller_1.inputController);
+        var txt = "player.x : " + player.x + ", player.y : " + player.y; //displayController.drawTxt(txt, 10, 50);
+
+        var txt2 = "tileX : " + tileX + ", tileY : " + tileY; //displayController.drawTxt(txt2, 10, 100);
+
         viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
       } else {
         player.groundY = 704;
-        player.update(inputController);
-        var texteCoordonneesX = "player.x : " + player.x;
-        displayController.drawTxt(texteCoordonneesX, 10, 120);
-        var texteCoordonneesY = "player.y : " + player.y;
-        displayController.drawTxt(texteCoordonneesY, 10, 150);
-        var texteCreditsDispo = "Credits : " + player.getLifeCredit;
-        displayController.drawTxt(texteCreditsDispo, 10, 180);
+        player.update(input_controller_1.inputController);
+        var texteCoordonneesX = "player.x : " + player.x; //displayController.drawTxt(texteCoordonneesX, 10, 120);
+
+        var texteCoordonneesY = "player.y : " + player.y; //displayController.drawTxt(texteCoordonneesY, 10, 150);
+
+        var texteCreditsDispo = "Credits : " + player.getLifeCredit; //displayController.drawTxt(texteCreditsDispo, 10, 180);
+
         viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
       }
     }
@@ -1230,7 +1264,7 @@ function loop() {
     enemy.update();
     displayController.drawSprite(enemyImg, viewPort, enemy);
 
-    if (player.isAttacking && exports.gameService.checkCollision(player.damageZone, enemy)) {
+    if (player.isAttacking && game_service_1.gameService.checkCollision(player.damageZone, enemy)) {
       alert('collision entre ennemi et damagezone');
       enemiesList.splice(index, 1);
     }
@@ -1263,12 +1297,35 @@ function loop() {
 //     loop();
 // };
 //console.log(tileSetImg)
-// On ajoute les évènement pour resizer le canvas
 
 
-window.addEventListener('resize', displayController.resizeCanvas, false);
-window.addEventListener('orientationchange', displayController.resizeCanvas, false);
-loop();
+var screen1 = {
+  bgColor: '#000000',
+  textList: [{
+    txt: 'Actraiser',
+    color: '#FFFFFF',
+    font: '100px Comic Sans MS',
+    canvasX: 150,
+    canvasY: 100
+  }, {
+    txt: 'Press Start',
+    color: '#FFFFFF',
+    font: '40px Comic Sans MS',
+    canvasX: 250,
+    canvasY: 300
+  }, {
+    txt: 'copyright....',
+    color: '#FFFFFF',
+    font: '20px Comic Sans MS',
+    canvasX: 250,
+    canvasY: 400
+  }]
+};
+displayController.drawStoryScreen(screen1); // On ajoute les évènement pour resizer le canvas
+//window.addEventListener('resize', displayController.resizeCanvas, false);
+//window.addEventListener('orientationchange', displayController.resizeCanvas, false);
+
+window.addEventListener('keypress', loop, true);
 },{"./src/model/class/display-controller":"src/model/class/display-controller.ts","./src/model/class/input-controller":"src/model/class/input-controller.ts","./src/model/class/player":"src/model/class/player.ts","./src/model/class/game-service":"src/model/class/game-service.ts","./src/model/class/enemy":"src/model/class/enemy.ts","./src/model/class/viewport":"src/model/class/viewport.ts","./src/model/class/block":"src/model/class/block.ts","./src/model/class/map":"src/model/class/map.ts","./src/model/class/tileSet":"src/model/class/tileSet.ts"}],"../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -1297,7 +1354,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49201" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49262" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
