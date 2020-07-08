@@ -153,6 +153,8 @@ var CharacterSprite =
 function () {
   function CharacterSprite(name, x, y, characterImg) {
     this.lifeCredit = 10;
+    this.x = 500;
+    this.y = 700;
     this.width = 64;
     this.height = 64;
     this.mapIndexPosition = Math.floor(this.centerX / 48) + 60 * Math.floor(this.centerY / 48);
@@ -223,11 +225,17 @@ function () {
     this.y = y;
     this.characterImg = characterImg;
     this.updateDamageZone();
-  }
+  } // Renseigne la position
+
 
   CharacterSprite.prototype.setPosition = function (x, y) {
     this.x = x;
     this.y = y;
+    this.setCenter();
+  }; // On recalcule les coordonnées du centre de l'entité
+
+
+  CharacterSprite.prototype.setCenter = function () {
     this.centerX = this.x + this.width / 2;
     this.centerY = this.y + this.height / 2;
   }; // Méthode appelée quand le bouton de saut est touché
@@ -251,7 +259,7 @@ function () {
     },
     enumerable: true,
     configurable: true
-  }); // Méthode appelée quand le bouton d'action est touchée
+  }); // Méthode appelée quand le personnage attaque
 
   CharacterSprite.prototype.attack = function (status) {
     this.isAttacking = status;
@@ -459,19 +467,29 @@ function (_super) {
   __extends(Enemy, _super); // Constructeur de la classe des ennemies
 
 
-  function Enemy(name, x, y, characterImg, gameService) {
+  function Enemy(name, x, y, characterImg, gameService, player) {
     var _this = _super.call(this, name, x, y, characterImg) || this;
 
     _this.gameService = gameService;
-    var that = _this;
-    _this.autoMove = setInterval(function () {
-      that.setRandomDirection();
-    }, 3000);
+    _this.player = player;
+    console.log('dans constucteur player', player);
     return _this;
   } // Méthode qui va modifier les coordonnées du people.
 
 
-  Enemy.prototype.update = function (inputController) {
+  Enemy.prototype.update = function () {
+    console.log('gameService', this.gameService);
+    console.log('playerin', this.player);
+    var distance = this.gameService.getDistance(this.player.x, this.x);
+
+    if (distance < 200 && this.player.x > this.x) {
+      this.currentDirection = 'right';
+    } else if (distance < 200 && this.player.x < this.x) {
+      this.currentDirection = 'left';
+    } else {
+      this.currentDirection = 'standing';
+    }
+
     switch (this.currentDirection) {
       case 'right':
         this.speedX = 2;
@@ -503,6 +521,14 @@ function (_super) {
       //   this.faceY = this.downCycleLoop[this.currentLoopIndex].faceY;
       //   break;
 
+      case 'standing':
+        this.speedY = 0;
+        this.y = this.y + this.speedY; // On détermine la positon x/y du crop du personnage
+
+        this.faceX = this.downCycleLoop[this.currentLoopIndex].faceX;
+        this.faceY = this.downCycleLoop[this.currentLoopIndex].faceY;
+        break;
+
       default:
         alert('default update');
         break;
@@ -510,32 +536,11 @@ function (_super) {
 
     this.updateFaceCrop();
     this.setCenter();
-  }; // Réinitialise les cordonnées x /y du people
-
-
-  Enemy.prototype.resetCoordinates = function (x, y) {
-    this.x = x;
-    this.y = y;
   }; // Renvoie une direction aléatoirement
 
 
   Enemy.prototype.setRandomDirection = function () {
     this.currentDirection = this.gameService.randomDirection();
-  }; // On recalcule les coordonnées du centre de l'entité
-
-
-  Enemy.prototype.setCenter = function () {
-    // On recalcule le centre du people
-    this.centerX = this.x + this.width - this.width / 2;
-    this.centerY = this.y + this.height - this.height / 2;
-  }; // Méthode pour réinitialiser la position du people dans la map
-
-
-  Enemy.prototype.setPosition = function (destination) {
-    this.x = destination.x;
-    this.y = destination.y; //this.currentWorldPosition =  new WorldPosition(destination.worldId,destination.mapSheetId );
-
-    this.setCenter(); //this.setMapIndexPosition();
   }; // Méthode pour définir les coordonnées de la posture à croper
 
 
@@ -653,6 +658,63 @@ function () {
 }();
 
 exports.Block = Block;
+},{}],"src/model/class/moving-plateform.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var MovingPlateform =
+/** @class */
+function () {
+  // Constructeur de la classe des plateformes
+  function MovingPlateform(anchorX, anchorY, gameService) {
+    this.width = 64;
+    this.height = 64;
+    this.speedX = 1;
+    this.speedY = 0;
+    this.faceX = 64;
+    this.faceY = 128;
+    this.anchorX = anchorX;
+    this.anchorY = anchorY;
+    this.x = anchorX;
+    this.y = anchorY;
+    this.gameService = gameService;
+    this.setCenter();
+  } // Méthode qui va modifier les coordonnées de la plateforme
+
+
+  MovingPlateform.prototype.update = function () {
+    var distance = this.gameService.getDistance(this.x, this.anchorX);
+    console.log('distance', distance);
+
+    if (distance >= 50 && this.x > this.anchorY) {
+      this.x = this.x - this.speedX;
+    } else if (distance >= 50 && this.x < this.anchorX) {
+      this.x = this.x + this.speedX;
+    } else {
+      this.x = this.x + this.speedX;
+    }
+  }; // Réinitialise les cordonnées x /y de la plateforme
+
+
+  MovingPlateform.prototype.setCoordinates = function (x, y) {
+    this.x = x;
+    this.y = y;
+    this.setCenter();
+  }; // On recalcule le centre
+
+
+  MovingPlateform.prototype.setCenter = function () {
+    this.centerX = this.x + this.width / 2;
+    this.centerY = this.y + this.height / 2;
+  };
+
+  return MovingPlateform;
+}();
+
+exports.MovingPlateform = MovingPlateform;
 },{}],"src/model/class/display-controller.ts":[function(require,module,exports) {
 "use strict";
 
@@ -665,6 +727,8 @@ var player_1 = require("./player");
 var enemy_1 = require("./enemy");
 
 var block_1 = require("./block");
+
+var moving_plateform_1 = require("./moving-plateform");
 
 var DisplayController =
 /** @class */
@@ -709,7 +773,7 @@ function () {
       canvasY = this.canvas.height - 256 - sprite.height;
     }
 
-    if (sprite instanceof enemy_1.Enemy || sprite instanceof block_1.Block) {
+    if (sprite instanceof enemy_1.Enemy || sprite instanceof block_1.Block || sprite instanceof moving_plateform_1.MovingPlateform) {
       canvasX = sprite.x - viewPort.x;
       canvasY = sprite.y - viewPort.y;
     }
@@ -796,7 +860,7 @@ function () {
 }();
 
 exports.DisplayController = DisplayController;
-},{"./player":"src/model/class/player.ts","./enemy":"src/model/class/enemy.ts","./block":"src/model/class/block.ts"}],"src/model/class/input-controller.ts":[function(require,module,exports) {
+},{"./player":"src/model/class/player.ts","./enemy":"src/model/class/enemy.ts","./block":"src/model/class/block.ts","./moving-plateform":"src/model/class/moving-plateform.ts"}],"src/model/class/input-controller.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -857,7 +921,12 @@ function () {
     return Math.floor(Math.random() * b) + a;
   };
 
-  ; // Méthode qui renvoie une direction aléatoire
+  ; // Calcule la distance entre a et b
+
+  GameService.prototype.getDistance = function (a, b) {
+    return Math.abs(a - b);
+  }; // Méthode qui renvoie une direction aléatoire
+
 
   GameService.prototype.randomDirection = function () {
     var randomNumber = this.rangeNumber(1, 2);
@@ -886,7 +955,143 @@ function () {
 
 exports.GameService = GameService;
 exports.gameService = new GameService();
-},{}],"src/model/class/viewport.ts":[function(require,module,exports) {
+},{}],"src/model/class/villager.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (b.hasOwnProperty(p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var character_sprite_1 = require("./character-sprite");
+
+var Villager =
+/** @class */
+function (_super) {
+  __extends(Villager, _super); // Constructeur de la classe des Villageois
+
+
+  function Villager(name, x, y, characterImg, gameService) {
+    var _this = _super.call(this, name, x, y, characterImg) || this;
+
+    _this.gameService = gameService;
+    var that = _this;
+    _this.autoMove = setInterval(function () {
+      that.setRandomDirection();
+    }, 3000);
+    return _this;
+  } // Méthode qui va modifier les coordonnées.
+
+
+  Villager.prototype.update = function () {
+    switch (this.currentDirection) {
+      case 'right':
+        this.speedX = 2;
+        this.x = this.x + this.speedX; // On détermine la positon x/y du crop du personnage
+
+        this.faceX = this.rightCycleLoop[this.currentLoopIndex].faceX;
+        this.faceY = this.rightCycleLoop[this.currentLoopIndex].faceY;
+        break;
+
+      case 'left':
+        this.speedX = 2;
+        this.x = this.x - this.speedX; // On détermine la positon x/y du crop du personnage
+
+        this.faceX = this.leftCycleLoop[this.currentLoopIndex].faceX;
+        this.faceY = this.leftCycleLoop[this.currentLoopIndex].faceY;
+        break;
+      // case 'north':
+      //   this.speedY = 2;
+      //   this.y = (this.y - this.speedY);
+      //   // On détermine la positon x/y du crop du personnage
+      //   this.faceX = this.upCycleLoop[this.currentLoopIndex].faceX;
+      //   this.faceY = this.upCycleLoop[this.currentLoopIndex].faceY;
+      //   break;
+      // case 'south':
+      //   this.speedY = 2;
+      //   this.y = (this.y + this.speedY);
+      //   // On détermine la positon x/y du crop du personnage
+      //   this.faceX = this.downCycleLoop[this.currentLoopIndex].faceX;
+      //   this.faceY = this.downCycleLoop[this.currentLoopIndex].faceY;
+      //   break;
+
+      default:
+        alert('default update');
+        break;
+    }
+
+    this.updateFaceCrop();
+    this.setCenter();
+  }; // Renvoie une direction aléatoirement
+
+
+  Villager.prototype.setRandomDirection = function () {
+    this.currentDirection = this.gameService.randomDirection();
+  }; // Méthode pour définir les coordonnées de la posture à croper
+
+
+  Villager.prototype.updateFaceCrop = function () {
+    // On incrémente le compteur de pas
+    if (this.currentLoopIndex < 3) {
+      this.currentLoopIndex++;
+    } else if (this.currentLoopIndex === 3) {
+      this.currentLoopIndex = 0;
+    }
+
+    if (this.currentDirection === 'left') {
+      this.currentCycleLoop = this.leftCycleLoop;
+    } else if (this.currentDirection === 'right') {
+      this.currentCycleLoop = this.rightCycleLoop;
+    }
+
+    if (this.currentDirection === 'right' && this.speedX < 0.1) {
+      // A l'arret vers la droite
+      this.faceX = 0;
+      this.faceY = 64;
+    } else if (this.currentDirection === 'left' && this.speedX > -0.1) {
+      // A l'arret la gauche
+      this.faceX = 0;
+      this.faceY = 32;
+    } else if (this.currentDirection === 'standing' && this.speedX < 0.1) {
+      this.faceX = 0;
+      this.faceY = 64;
+    } else {
+      // Il avance
+      this.faceX = this.currentCycleLoop[this.currentLoopIndex].faceX;
+      this.faceY = this.currentCycleLoop[this.currentLoopIndex].faceY;
+    }
+  };
+
+  return Villager;
+}(character_sprite_1.CharacterSprite);
+
+exports.Villager = Villager;
+},{"./character-sprite":"src/model/class/character-sprite.ts"}],"src/model/class/viewport.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1078,6 +1283,8 @@ var game_service_1 = require("./src/model/class/game-service");
 
 var enemy_1 = require("./src/model/class/enemy");
 
+var villager_1 = require("./src/model/class/villager");
+
 var viewport_1 = require("./src/model/class/viewport");
 
 var block_1 = require("./src/model/class/block");
@@ -1086,7 +1293,10 @@ var map_1 = require("./src/model/class/map");
 
 var tileSet_1 = require("./src/model/class/tileSet");
 
+var moving_plateform_1 = require("./src/model/class/moving-plateform");
+
 var enemiesList = [];
+var villagersList = [];
 var blockList = [];
 var mapData = {
   nbCol: 80,
@@ -1106,21 +1316,34 @@ var imgCharacterTileSetData = {
 var tileSetImg = document.getElementById('tileset');
 var playerImg = document.getElementById('heros6');
 var enemyImg = document.getElementById('personnage-important2');
+var villagerImg = document.getElementById('personnage-important2');
 var tileSet = new tileSet_1.TileSet(imgTileSetData);
 exports.map = new map_1.Map(mapData);
 var canvas = document.getElementById('game');
 var displayController = new display_controller_1.DisplayController(canvas);
-var player = new player_1.Player('benoit', 400, 600, playerImg); //const inputController =  new InputController();
+var player = new player_1.Player('benoit', 400, 600, playerImg);
+var movingPlateform = new moving_plateform_1.MovingPlateform(1000, 400, game_service_1.gameService); //const inputController =  new InputController();
 
 var viewPort = new viewport_1.ViewPort(0, 0, 800, 600); // export const gameService = new GameService();
 // Méthode pour créer des ennemis
 
 var initEnemies = function initEnemies(count) {
+  console.log('initplayer ', player); // 0n crée plusieurs ennemis
+
+  for (var i = 0; i < count; i++) {
+    var x = game_service_1.gameService.rangeNumber(400, 1500);
+    var y = 640;
+    enemiesList = __spreadArrays(enemiesList, [new enemy_1.Enemy('valor', x, y, enemyImg, game_service_1.gameService, player)]);
+  }
+}; // Méthode pour créer des villageois
+
+
+var initVillagers = function initVillagers(count) {
   // 0n crée plusieurs ennemis
   for (var i = 0; i < count; i++) {
     var x = game_service_1.gameService.rangeNumber(400, 1500);
     var y = 640;
-    enemiesList = __spreadArrays(enemiesList, [new enemy_1.Enemy('valor', x, y, enemyImg, game_service_1.gameService)]);
+    villagersList = __spreadArrays(villagersList, [new villager_1.Villager('dalia', x, y, villagerImg, game_service_1.gameService)]);
   }
 }; // Méthode pour créer des blocs
 
@@ -1140,7 +1363,8 @@ var initBlocks = function initBlocks(count) {
 
 var initAll = function initAll() {
   initEnemies(5);
-  initBlocks(5);
+  initBlocks(3);
+  initVillagers(2);
 };
 
 console.log('blockList', blockList);
@@ -1216,6 +1440,11 @@ function loop() {
       player.setLifeCredit = player.getLifeCredit - 1;
     }
   });
+  villagersList.forEach(function (villager) {//villager.update(player);
+    //displayController.drawSprite(villagerImg, viewPort, villager);
+  });
+  movingPlateform.update();
+  displayController.drawSprite(tileSetImg, viewPort, movingPlateform);
   player.update(input_controller_1.inputController);
   displayController.drawSprite(playerImg, viewPort, player);
   viewPort.defineViewPoint(player.x - (800 / 2 - player.width / 2), player.y - 600 / 2 + 20, 800, 600);
@@ -1261,6 +1490,7 @@ function loop() {
   }
 
   enemiesList.forEach(function (enemy, index) {
+    console.log('enemy', enemy);
     enemy.update();
     displayController.drawSprite(enemyImg, viewPort, enemy);
 
@@ -1326,7 +1556,7 @@ displayController.drawStoryScreen(screen1); // On ajoute les évènement pour re
 //window.addEventListener('orientationchange', displayController.resizeCanvas, false);
 
 window.addEventListener('keypress', loop, true);
-},{"./src/model/class/display-controller":"src/model/class/display-controller.ts","./src/model/class/input-controller":"src/model/class/input-controller.ts","./src/model/class/player":"src/model/class/player.ts","./src/model/class/game-service":"src/model/class/game-service.ts","./src/model/class/enemy":"src/model/class/enemy.ts","./src/model/class/viewport":"src/model/class/viewport.ts","./src/model/class/block":"src/model/class/block.ts","./src/model/class/map":"src/model/class/map.ts","./src/model/class/tileSet":"src/model/class/tileSet.ts"}],"../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./src/model/class/display-controller":"src/model/class/display-controller.ts","./src/model/class/input-controller":"src/model/class/input-controller.ts","./src/model/class/player":"src/model/class/player.ts","./src/model/class/game-service":"src/model/class/game-service.ts","./src/model/class/enemy":"src/model/class/enemy.ts","./src/model/class/villager":"src/model/class/villager.ts","./src/model/class/viewport":"src/model/class/viewport.ts","./src/model/class/block":"src/model/class/block.ts","./src/model/class/map":"src/model/class/map.ts","./src/model/class/tileSet":"src/model/class/tileSet.ts","./src/model/class/moving-plateform":"src/model/class/moving-plateform.ts"}],"../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -1354,7 +1584,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49262" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55122" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

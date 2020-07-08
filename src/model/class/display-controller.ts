@@ -4,6 +4,7 @@ import { Enemy } from './enemy';
 import { ViewPort } from './viewport';
 import { Block } from './block';
 import { Printable, TxtFormat} from '../interface/general-interfaces';
+import { MovingPlateform } from './moving-plateform';
 
 
 export class DisplayController {
@@ -52,7 +53,7 @@ export class DisplayController {
             canvasX = (this.canvas.width / 2) - sprite.width / 2;
             canvasY = (this.canvas.height - 256 - sprite.height);
         }
-        if (sprite instanceof Enemy || sprite instanceof Block){
+        if (sprite instanceof Enemy || sprite instanceof Block  || sprite instanceof MovingPlateform){
             canvasX = sprite.x - viewPort.x;
             canvasY = sprite.y - viewPort.y;
         }

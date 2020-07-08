@@ -1,6 +1,5 @@
-import { gameService } from '../../../index';
 import { sprite } from "../interface/general-interfaces";
-import { GameService } from './game-service';
+import { GameService, gameService } from './game-service';
 import { Player } from './player';
 
 export class Block {

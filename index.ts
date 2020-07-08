@@ -4,17 +4,20 @@ import { inputController } from './src/model/class/input-controller';
 import { Player } from './src/model/class/player';
 import { gameService } from './src/model/class/game-service';
 import { Enemy } from './src/model/class/enemy';
+import { Villager } from './src/model/class/villager';
 import { ViewPort } from './src/model/class/viewport';
 import { sprite } from './src/model/interface/general-interfaces';
 import { Block } from './src/model/class/block';
 import { Map } from './src/model/class/map';
 import { TileSet } from './src/model/class/tileSet';
 import { Printable } from './src/model/interface/general-interfaces';
+import { MovingPlateform } from './src/model/class/moving-plateform';
 
 
 
 
 let enemiesList =  [];
+let villagersList = [];
 let blockList = [];
 
 let  mapData = {
@@ -60,6 +63,9 @@ const imgCharacterTileSetData = {
 let tileSetImg = document.getElementById('tileset');
 let playerImg = document.getElementById('heros6');
 let enemyImg = document.getElementById('personnage-important2');
+let villagerImg = document.getElementById('personnage-important2');
+
+
 let tileSet = new TileSet(imgTileSetData);
 
 export let map =  new Map(mapData);
@@ -68,6 +74,7 @@ export let map =  new Map(mapData);
 const canvas: any =  document.getElementById('game');
 const displayController = new DisplayController(canvas);
 const player = new Player('benoit', 400, 600, playerImg);
+const movingPlateform = new MovingPlateform(1000, 400, gameService);
 
 //const inputController =  new InputController();
 const viewPort = new ViewPort(0, 0, 800, 600);
@@ -77,13 +84,26 @@ const viewPort = new ViewPort(0, 0, 800, 600);
 
 // Méthode pour créer des ennemis
 const initEnemies = (count: number) =>{
+    console.log('initplayer ', player);
 
     // 0n crée plusieurs ennemis
     for (let i = 0; i < count; i++) {
         const x = gameService.rangeNumber(400, 1500);
         const y = 640;
 
-        enemiesList = [...enemiesList, new Enemy('valor',x, y,enemyImg, gameService)];
+        enemiesList = [...enemiesList, new Enemy('valor', x, y, enemyImg, gameService, player)];
+    }
+}
+
+// Méthode pour créer des villageois
+const initVillagers = (count: number) => {
+
+    // 0n crée plusieurs ennemis
+    for (let i = 0; i < count; i++) {
+        const x = gameService.rangeNumber(400, 1500);
+        const y = 640;
+
+        villagersList = [...villagersList, new Villager('dalia',x, y,villagerImg, gameService)];
     }
 }
 
@@ -103,7 +123,8 @@ const initBlocks = (count: number)=> {
 
 const initAll = ()=> {
     initEnemies(5);
-    initBlocks(5);
+    initBlocks(3);
+    initVillagers(2);
 };
 
 console.log('blockList', blockList);
@@ -193,6 +214,14 @@ function loop() {
         }
     });
 
+    villagersList.forEach(villager => {
+        //villager.update(player);
+        //displayController.drawSprite(villagerImg, viewPort, villager);
+    });
+
+    movingPlateform.update();
+    displayController.drawSprite(tileSetImg,viewPort,movingPlateform);
+
     player.update(inputController);
     displayController.drawSprite(playerImg, viewPort, player);
     viewPort.defineViewPoint(player.x - ((800 / 2) - player.width / 2), (player.y - (600/2) + 20), 800, 600);
@@ -249,6 +278,7 @@ function loop() {
     
     
     enemiesList.forEach((enemy, index) => {
+        console.log('enemy',enemy);
         enemy.update();
         displayController.drawSprite(enemyImg, viewPort, enemy);
 

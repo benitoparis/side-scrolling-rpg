@@ -1,45 +1,26 @@
 import { sprite } from "../interface/general-interfaces";
 import { gameService, GameService } from './game-service';
 import { CharacterSprite } from './character-sprite';
-import { Player } from './player';
 import { InputController } from "./input-controller";
 
-export class Enemy extends CharacterSprite {
+export class Villager extends CharacterSprite {
 
-  player: Player;
+    autoMove: any;
+    gameService: GameService;
 
-  // Constructeur de la classe des ennemies
-  constructor(
-    name: string,
-    x: number,
-    y: number,
-    characterImg: any,
-    private gameService: GameService,
-    player: Player
-  ) {
-    
+ // Constructeur de la classe des Villageois
+ constructor(name: string, x: number, y:number, characterImg: any, gameService: GameService) {
+
     super(name, x, y, characterImg);
-    this.player = player;
-    console.log('dans constucteur player', player);
-    
+    this.gameService = gameService;
+    let that  = this;
+    this.autoMove = setInterval(() => { that.setRandomDirection();}, 3000);
   }
 
 
-  // Méthode qui va modifier les coordonnées du people.
+
+  // Méthode qui va modifier les coordonnées.
   update(): void {
-    console.log('gameService', this.gameService);
-    console.log('playerin', this.player);
-
-    const distance = this.gameService.getDistance(this.player.x, this.x);
-
-    if (distance < 200 && this.player.x > this.x){
-      this.currentDirection = 'right';
-    } else if (distance < 200 && this.player.x < this.x){
-      this.currentDirection = 'left';
-    } else {
-      this.currentDirection = 'standing';
-    }
-
 
     switch (this.currentDirection) {
       case 'right':
@@ -82,14 +63,6 @@ export class Enemy extends CharacterSprite {
       //   this.faceY = this.downCycleLoop[this.currentLoopIndex].faceY;
       //   break;
 
-      case 'standing':
-      this.speedY = 0;
-      this.y = (this.y + this.speedY);
-      // On détermine la positon x/y du crop du personnage
-      this.faceX = this.downCycleLoop[this.currentLoopIndex].faceX;
-      this.faceY = this.downCycleLoop[this.currentLoopIndex].faceY;
-      break;
-
         default:
           alert('default update');
           break;
@@ -99,6 +72,7 @@ export class Enemy extends CharacterSprite {
 
     this.setCenter();
   }
+
 
   // Renvoie une direction aléatoirement
   setRandomDirection(): void {

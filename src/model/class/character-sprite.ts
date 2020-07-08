@@ -1,13 +1,12 @@
 
 import { DamageZone } from './damage-zone';
 import { inputController, InputController } from './input-controller';
-import { characterTileSet } from './../../../index';
 
 export class CharacterSprite {
     name: string;
     lifeCredit = 10;
-    x: number;
-    y: number;
+    x= 500;
+    y = 700;
     width = 64;
     height = 64;
     centerX: number;
@@ -49,9 +48,17 @@ export class CharacterSprite {
     }
 
 
+    // Renseigne la position
     setPosition(x: number, y: number): void {
         this.x = x;
         this.y = y;
+ 
+        this.setCenter();
+    }
+
+
+    // On recalcule les coordonnées du centre de l'entité
+    setCenter(): void {
         this.centerX = (this.x + this.width / 2);
         this.centerY = (this.y + this.height / 2);
     }
@@ -64,7 +71,7 @@ export class CharacterSprite {
     get getLifeCredit():number { return this.lifeCredit;};
     set setLifeCredit(value: number) { this.lifeCredit = value;}
 
-    // Méthode appelée quand le bouton d'action est touchée
+    // Méthode appelée quand le personnage attaque
     attack(status : boolean): void {
         this.isAttacking = status;
         this.attackTimeFrame = 0;
@@ -89,6 +96,8 @@ export class CharacterSprite {
     setmapIndexPosition(): void {
         this.mapIndexPosition = Math.floor(this.centerX / this.width) + (80 * Math.floor(this.centerY / this.height));
     }
+
+
     
 
 

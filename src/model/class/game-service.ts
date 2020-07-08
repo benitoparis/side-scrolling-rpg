@@ -43,6 +43,11 @@ export class GameService {
         return Math.floor((Math.random() * b)) + a;
     };
 
+    // Calcule la distance entre a et b
+    getDistance (a: number,b: number): number {
+        return Math.abs(a - b);
+    }
+
     // Méthode qui renvoie une direction aléatoire
     randomDirection(){
         const randomNumber = this.rangeNumber(1,2);
